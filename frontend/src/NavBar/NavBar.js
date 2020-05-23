@@ -8,10 +8,23 @@ function NavBar(props) {
     props.history.replace("/");
   };
 
+  const navBarColour = {
+    backgroundColor: "#CEFBF8",
+  };
+
+  const title = {
+    fontFamily: "Arial, Helvetica, sans-serif",
+    fontWeight: "800",
+    color: "#555555",
+    fontStyle: "Italic",
+    letterSpacing: "0.1em",
+    fontSize: "22px",
+  };
+
   return (
-    <nav className="navbar navbar-dark bg-primary fixed-top">
-      <Link className="navbar-brand" to="/">
-        Q&App
+    <nav class="navbar navbar-light fixed-top" style={navBarColour}>
+      <Link className="navbar-brand" to="/" style={title}>
+        ModPlanner Forums
       </Link>
       {!auth0Client.isAuthenticated() && (
         <button className="btn btn-dark" onClick={auth0Client.signIn}>
@@ -20,7 +33,7 @@ function NavBar(props) {
       )}
       {auth0Client.isAuthenticated() && (
         <div>
-          <label className="mr-2 text-white">
+          <label className="mr-2 text-secondary">
             {auth0Client.getProfile().name}
           </label>
           <button

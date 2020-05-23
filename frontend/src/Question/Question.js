@@ -60,6 +60,7 @@ class Question extends Component {
             {question.answers.map((answer, idx) => (
               <p className="lead" key={idx}>
                 {answer.answer}
+                <hr />
               </p>
             ))}
           </div>
