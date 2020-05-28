@@ -29,7 +29,19 @@ class App extends Component {
     }
     this.setState({ checkingSession: false });
   }
+
   render() {
+    const footerStyle = {
+      position: "fixed",
+      width: "100%",
+      background: "#333",
+      color: "#fff",
+      textAlign: "center",
+      padding: "20",
+      //marginTop: "40",
+      bottom: "0",
+    };
+
     return (
       <div>
         <NavBar />
@@ -41,6 +53,7 @@ class App extends Component {
           component={NewQuestion}
           checkingSession={this.state.checkingSession}
         />
+        <footer style={footerStyle}>Copyright © 2020; Mod Planner</footer>
       </div>
     );
   }
