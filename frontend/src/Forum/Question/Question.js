@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import axios from "axios";
 import SubmitAnswer from "./SubmitAnswer";
-import auth0Client from "../Auth";
+import auth0Client from "../../Auth";
+import Footer from "../Footer/Footer";
 
 class Question extends Component {
   constructor(props) {
@@ -46,25 +47,28 @@ class Question extends Component {
     const { question } = this.state;
     if (question === null) return <p>Loading ...</p>;
     return (
-      <div className="container">
-        <div className="row">
-          <div className="jumbotron col-12">
-            <h1 className="display-3">{question.title}</h1>
-            <p className="lead">{question.description}</p>
-            <hr className="my-4" />
-            <SubmitAnswer
-              questionId={question.id}
-              submitAnswer={this.submitAnswer}
-            />
-            <p>Answers:</p>
-            {question.answers.map((answer, idx) => (
-              <p className="lead" key={idx}>
-                {answer.answer}
-                <hr />
-              </p>
-            ))}
+      <div>
+        <div className="container">
+          <div className="row">
+            <div className="jumbotron col-12">
+              <h1 className="display-3">{question.title}</h1>
+              <p className="lead">{question.description}</p>
+              <hr className="my-4" />
+              <SubmitAnswer
+                questionId={question.id}
+                submitAnswer={this.submitAnswer}
+              />
+              <p>Answers:</p>
+              {question.answers.map((answer, idx) => (
+                <div className="lead" key={idx}>
+                  {answer.answer}
+                  <hr />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
+        <Footer />
       </div>
     );
   }

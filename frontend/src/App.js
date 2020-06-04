@@ -1,12 +1,15 @@
 import React, { Component } from "react";
 import { Route, withRouter } from "react-router-dom";
-import NavBar from "./NavBar/NavBar";
-import Questions from "./Questions/Questions";
-import Question from "./Question/Question";
+import Forum from "./Forum/Footer/Footer";
+import Album from "./Album";
 import Callback from "./Callback";
-import NewQuestion from "./NewQuestion/NewQuestion";
-import SecuredRoute from "./SecuredRoute/SecuredRoute";
 import auth0Client from "./Auth";
+import AppBar from "./AppBar/AppBar";
+import Questions from "./Forum/Questions/Questions";
+import Question from "./Forum/Question/Question";
+import NewQuestion from "./Forum/NewQuestion/NewQuestion";
+import SecuredRoute from "./Forum/SecuredRoute/SecuredRoute";
+import Footer from "./Forum/Footer/Footer";
 
 class App extends Component {
   constructor(props) {
@@ -29,31 +32,21 @@ class App extends Component {
     }
     this.setState({ checkingSession: false });
   }
-
   render() {
-    const footerStyle = {
-      position: "fixed",
-      width: "100%",
-      background: "#333",
-      color: "#fff",
-      textAlign: "center",
-      padding: "20",
-      //marginTop: "40",
-      bottom: "0",
-    };
-
     return (
       <div>
-        <NavBar />
-        <Route exact path="/" component={Questions} />
-        <Route exact path="/question/:questionId" component={Question} />
-        <Route exact path="/callback" component={Callback} />
+        <AppBar />
+        <Route exact path="/" component={Album} />
+        <Route exact path="/Forum" component={Forum} />
+        <Route path="/Forum" component={Questions} />
+        <Route path="/Forum" component={Footer} />
+        <Route path="/question/:questionId" component={Question} />
         <SecuredRoute
           path="/new-question"
           component={NewQuestion}
           checkingSession={this.state.checkingSession}
         />
-        <footer style={footerStyle}>Copyright © 2020; Mod Planner</footer>
+        <Route exact path="/callback" component={Callback} />
       </div>
     );
   }
