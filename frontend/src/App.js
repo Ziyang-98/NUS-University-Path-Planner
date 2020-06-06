@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Route, withRouter } from "react-router-dom";
-import Forum from "./Forum/Footer/Footer";
-import Album from "./Album";
+import Album from "./Album/Album";
 import Callback from "./Callback";
 import auth0Client from "./Auth";
 import AppBar from "./AppBar/AppBar";
@@ -9,7 +8,8 @@ import Questions from "./Forum/Questions/Questions";
 import Question from "./Forum/Question/Question";
 import NewQuestion from "./Forum/NewQuestion/NewQuestion";
 import SecuredRoute from "./Forum/SecuredRoute/SecuredRoute";
-import Footer from "./Forum/Footer/Footer";
+import About from "./About/About";
+import Footer from "./Footer/Footer";
 
 class App extends Component {
   constructor(props) {
@@ -37,9 +37,8 @@ class App extends Component {
       <div>
         <AppBar />
         <Route exact path="/" component={Album} />
-        <Route exact path="/Forum" component={Forum} />
+        <Route path="/About" component={About} />
         <Route path="/Forum" component={Questions} />
-        <Route path="/Forum" component={Footer} />
         <Route path="/question/:questionId" component={Question} />
         <SecuredRoute
           path="/new-question"
@@ -47,6 +46,7 @@ class App extends Component {
           checkingSession={this.state.checkingSession}
         />
         <Route exact path="/callback" component={Callback} />
+        <Footer />
       </div>
     );
   }

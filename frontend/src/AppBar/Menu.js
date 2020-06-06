@@ -88,12 +88,19 @@ export default function CustomizedMenus() {
             <ListItemText primary="Home" />
           </StyledMenuItem>
         </Link>
-        <StyledMenuItem>
-          <ListItemIcon>
-            <AboutIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText primary="About" />
-        </StyledMenuItem>
+        <Link
+          className="moveHome"
+          color="inherit"
+          style={{ textDecoration: "none" }}
+          href="/About"
+        >
+          <StyledMenuItem>
+            <ListItemIcon>
+              <AboutIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary="About" />
+          </StyledMenuItem>
+        </Link>
         <StyledMenuItem>
           <ListItemIcon>
             <PlannerIcon fontSize="small" />
