@@ -10,6 +10,9 @@ import NewQuestion from "./Forum/NewQuestion/NewQuestion";
 import SecuredRoute from "./Forum/SecuredRoute/SecuredRoute";
 import About from "./About/About";
 import Footer from "./Footer/Footer";
+import Planner from "./Planner/Planner";
+import Home from "./Home/Home";
+import ReviewsGuides from "./Reviews/Reviews";
 
 class App extends Component {
   constructor(props) {
@@ -36,8 +39,10 @@ class App extends Component {
     return (
       <div>
         <AppBar />
-        <Route exact path="/" component={Album} />
+        <Route exact path="/" component={Home} />
         <Route path="/About" component={About} />
+        <Route path="/Planner" component={Planner} />
+        <Route path="/ReviewsGuides" component={ReviewsGuides} />
         <Route path="/Forum" component={Questions} />
         <Route path="/question/:questionId" component={Question} />
         <SecuredRoute

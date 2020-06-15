@@ -2,38 +2,40 @@ import React from "react";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
+import Container from "@material-ui/core/Container";
+import bg from "../Images/showcase.jpg";
 
 const useStyles = makeStyles((theme) => ({
   container: {
     display: "flex",
     justifyContent: "center",
-    alignSelf: "stretch",
-    height: 150,
+    alignItems: "center",
+    width: "100%",
+    // backgroundImage: bg,
+    height: 200,
   },
 
   text: {
     color: "#1C53E2",
-    fontWeight: "fontWeightBold",
+    fontWeight: 400,
   },
 }));
 
-function AboutUs() {
+export default function Showcase() {
   const classes = useStyles();
 
   return (
-    <div className={classes.container}>
-      <Typography
-        className={classes.text}
-        variant="h1"
-        component="h2"
-        gutterBottom
-      >
-        <Box fontWeight={400}>About us</Box>
-      </Typography>
-    </div>
+    <Container maxWidth="auto" className={classes.container}>
+      <Box>
+        <Typography
+          className={classes.text}
+          variant="h1"
+          component="h2"
+          gutterBottom
+        >
+          About us
+        </Typography>
+      </Box>
+    </Container>
   );
-}
-
-export default function Theming() {
-  return <AboutUs />;
 }

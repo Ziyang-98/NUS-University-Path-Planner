@@ -89,7 +89,7 @@ export default function CustomizedMenus() {
           </StyledMenuItem>
         </Link>
         <Link
-          className="moveHome"
+          className="toHome"
           color="inherit"
           style={{ textDecoration: "none" }}
           href="/About"
@@ -101,14 +101,37 @@ export default function CustomizedMenus() {
             <ListItemText primary="About" />
           </StyledMenuItem>
         </Link>
-        <StyledMenuItem>
-          <ListItemIcon>
-            <PlannerIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText primary="Mod Planner" />
-        </StyledMenuItem>
+
         <Link
-          className="returnHome"
+          className="toPlanner"
+          color="inherit"
+          style={{ textDecoration: "none" }}
+          href="/Planner"
+        >
+          <StyledMenuItem>
+            <ListItemIcon>
+              <PlannerIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary="Planner" />
+          </StyledMenuItem>
+        </Link>
+
+        <Link
+          className="toReviews"
+          color="inherit"
+          style={{ textDecoration: "none" }}
+          href="/ReviewsGuides"
+        >
+          <StyledMenuItem>
+            <ListItemIcon>
+              <GuidesIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary="Reviews / Guides" />
+          </StyledMenuItem>
+        </Link>
+
+        <Link
+          className="toForum"
           color="inherit"
           style={{ textDecoration: "none" }}
           href="/Forum"
@@ -120,12 +143,6 @@ export default function CustomizedMenus() {
             <ListItemText primary="Forums" />
           </StyledMenuItem>
         </Link>
-        <StyledMenuItem>
-          <ListItemIcon>
-            <GuidesIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText primary="Reviews / Guides" />
-        </StyledMenuItem>
       </StyledMenu>
     </div>
   );

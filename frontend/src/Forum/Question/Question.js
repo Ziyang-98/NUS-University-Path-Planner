@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import axios from "axios";
 import SubmitAnswer from "./SubmitAnswer";
 import auth0Client from "../../Auth";
-import Footer from "../Footer/Footer";
 
 class Question extends Component {
   constructor(props) {
@@ -68,7 +67,6 @@ class Question extends Component {
             </div>
           </div>
         </div>
-        <Footer />
       </div>
     );
   }
