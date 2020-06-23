@@ -1,0 +1,28 @@
+<h1><%- review.title %> by <%- review.name %></h1>
+<p><%- review.desc %></p>
+
+<h2>
+    Votes: <%- review.votes %>
+    <form action="/upvote" method="POST">
+        <input type="hidden" name="name" value=<%- review.name %>>
+        <input type="hidden" name="upvoted" value=<%- JSON.stringify(review.upvoted); %>>
+        <input type="hidden" name="downvoted" value=<%- JSON.stringify(review.downvoted); %>>
+        <button>Upvote</button>
+    </form>
+
+    <form action="/downvote" method="POST">
+        <input type="hidden" name="name" value=<%- review.name %>>
+        <input type="hidden" name="upvoted" value=<%- JSON.stringify(review.upvoted); %>>
+        <input type="hidden" name="downvoted" value=<%- JSON.stringify(review.downvoted); %>>
+        <button>Downvote</button>
+    </form>
+</h2>
+
+<h3 class="modules">Planner</h3>
+
+<% const modArr = Object.keys(review.moduleList) %>
+<% modArr.sort() %>
+<% for(key of modArr) {%>
+<h3><%= key.slice(0, 5) + ' semester ' + key.slice(5, 6) %></h3>
+<span><%= review.moduleList[key] %></span>
+<% }%>

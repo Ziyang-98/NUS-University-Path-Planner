@@ -1,0 +1,19 @@
+<h2>You are submitting your planner as a guide.</h2>
+
+<form action="/reviews" method="POST">
+    <h3>Please enter the following before submitting:</h3>
+
+    <p>
+        <label for="title">Enter title: </label><br />
+        <input id="title" type="text" name="title" size="48" maxlength="30">
+    </p>
+
+    <p>
+        <label for="desc">Enter a description for your guide: </label><br />
+        <textarea name="desc" id="desc" rows="4" cols="50"></textarea>
+    </p>
+
+    <input type="hidden" name="name" value=<%- name %>>
+    <input type="hidden" name="moduleList" value=<%- JSON.stringify(moduleList); %>>
+    <button type="submit">Enter</button>
+</form>
