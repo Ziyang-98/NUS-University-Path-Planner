@@ -5,6 +5,12 @@ import Container from "@material-ui/core/Container";
 import auth0Client from "../../Auth";
 
 const useStyles = makeStyles((theme) => ({
+  notSignIn: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: theme.spacing(10),
+  },
   container: {
     display: "flex",
     justifyContent: "center",
@@ -19,12 +25,14 @@ const useStyles = makeStyles((theme) => ({
 export default function Showcase() {
   const classes = useStyles();
   return (
-    <Container maxWidth="auto" className={classes.container}>
+    <Container width="auto" className={classes.container}>
       <div>
         {!auth0Client.isAuthenticated() && (
-          <Typography variant="h3">
-            Welcome, please sign in to start planning!
-          </Typography>
+          <div className={classes.notSignIn}>
+            <Typography variant="h3">
+              Welcome, please sign in to start planning!
+            </Typography>
+          </div>
         )}
         {auth0Client.isAuthenticated() && (
           <Typography variant="h4">

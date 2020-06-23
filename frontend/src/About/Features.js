@@ -14,6 +14,8 @@ import ExpandMore from "@material-ui/icons/ExpandMore";
 import Box from "@material-ui/core/Box";
 import { Typography } from "@material-ui/core";
 import ForumPic from "../Images/forum.png";
+import ReviewsPic from "../Images/reviews.png";
+import PlannerPic from "../Images/planner.png";
 import Link from "@material-ui/core/Link";
 import Button from "@material-ui/core/Button";
 
@@ -50,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "#f9f9f9",
     width: "30%",
   },
-  forumImage: {
+  images: {
     height: 180,
     width: 300,
   },
@@ -99,15 +101,17 @@ export default function NestedList() {
       <Collapse in={openPlanner} timeout="auto" unmountOnExit>
         <Typography variant="subtitle1">
           <Box className={classes.infoBox}>
-            <Box className={classes.imageContainer}>Insert image here</Box>
+            <Box className={classes.imageContainer}>
+              <img className={classes.images} src={PlannerPic} />
+            </Box>
             <Box className={classes.infoContainer}>
               The planner interface allows user to add modules based on user's
               recommendations from data statistics, as well as user's own
               preference of modules in their respective fields.
               <div className={classes.forumButton}>
-                <Link href="#">
+                <Link href="/Planner">
                   <Button variant="outlined" color="primary">
-                    Move to Reviews/Guides
+                    Move to Planner
                   </Button>
                 </Link>
               </div>
@@ -126,13 +130,15 @@ export default function NestedList() {
       <Collapse in={openReview} timeout="auto" unmountOnExit>
         <Typography variant="subtitle1">
           <Box className={classes.infoBox}>
-            <Box className={classes.imageContainer}>Insert image here</Box>
+            <Box className={classes.imageContainer}>
+              <img className={classes.images} src={ReviewsPic} />
+            </Box>
             <Box className={classes.infoContainer}>
               The reviews / guides section features planners made my users. It
               recommends specific combination of modules and their benefits to
               other users and advise other users about module planning.
               <div className={classes.forumButton}>
-                <Link href="#">
+                <Link href="/ReviewsGuides">
                   <Button variant="outlined" color="primary">
                     Move to Reviews/Guides
                   </Button>
@@ -154,7 +160,7 @@ export default function NestedList() {
         <Typography variant="subtitle1">
           <Box className={classes.infoBox}>
             <Box className={classes.imageContainer}>
-              <img className={classes.forumImage} src={ForumPic} />
+              <img className={classes.images} src={ForumPic} />
             </Box>
             <Box className={classes.infoContainer}>
               The forum is a Q&A platforum for users to post/answer any queries

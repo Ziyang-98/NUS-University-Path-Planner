@@ -40,6 +40,7 @@ class App extends Component {
       <div>
         <AppBar />
         <Route exact path="/" component={Home} />
+        <Route exact path="/callback" component={Callback} />
         <Route path="/About" component={About} />
         <Route path="/Planner" component={Planner} />
         <Route path="/ReviewsGuides" component={ReviewsGuides} />
@@ -50,7 +51,6 @@ class App extends Component {
           component={NewQuestion}
           checkingSession={this.state.checkingSession}
         />
-        <Route exact path="/callback" component={Callback} />
         <Footer />
       </div>
     );
