@@ -266,22 +266,28 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
                     reviews = results.reviews
                     const review = reviews[req.body.name]
 
-                    //logic of upvoting
-                    const upvoted = JSON.parse(req.body.upvoted).filter(user => user === curr_user)
-                    const downvoted = JSON.parse(req.body.downvoted).filter(user => user === curr_user)
+                    if (curr_user) {
+                        //logic of upvoting
+                        const upvoted = JSON.parse(req.body.upvoted).filter(user => user === curr_user)
+                        const downvoted = JSON.parse(req.body.downvoted).filter(user => user === curr_user)
 
-                    //if user has previously downvoted
-                    if (downvoted.length > 0) {
-                        review.votes = review.votes + 1
-                        review.downvoted = JSON.parse(req.body.downvoted).filter(user => user != curr_user)
-                    } else if (upvoted.length == 0) {
-                        review.votes = review.votes + 1
-                        review.upvoted.push(curr_user)
+                        //if user has previously upvoted
+                        if (upvoted.length > 0) {
+                            review.votes = review.votes - 1
+                            review.upvoted = JSON.parse(req.body.upvoted).filter(user => user != curr_user)
+                        } else if (downvoted.length > 0) {
+                            review.votes = review.votes + 2
+                            review.upvoted.push(curr_user)
+                            review.downvoted = JSON.parse(req.body.downvoted).filter(user => user != curr_user)
+                        } else if (upvoted.length == 0) {
+                            review.votes = review.votes + 1
+                            review.upvoted.push(curr_user)
+                        }
+
+                        reviews[req.body.name] = review
+                        results.reviews = reviews
+                        db.collection('data').updateOne({ reviews: { $exists: true } }, { $set: { reviews: results.reviews } })
                     }
-
-                    reviews[req.body.name] = review
-                    results.reviews = reviews
-                    db.collection('data').updateOne({ reviews: { $exists: true } }, { $set: { reviews: results.reviews } })
                 })
                 .then(ignore => {
                     res.redirect(`/reviews/${req.body.name}`)
@@ -294,21 +300,26 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
                     reviews = results.reviews
                     const review = reviews[req.body.name]
 
-                    //logic of downvoting
-                    const upvoted = JSON.parse(req.body.upvoted).filter(user => user === curr_user)
-                    const downvoted = JSON.parse(req.body.downvoted).filter(user => user === curr_user)
-
-                    if (upvoted.length > 0) {
-                        review.votes = review.votes - 1
-                        review.upvoted = JSON.parse(req.body.upvoted).filter(user => user != curr_user)
-                    } else if (downvoted.length == 0) {
-                        review.votes = review.votes - 1
-                        review.downvoted.push(curr_user)
-
+                    if (curr_user) {
+                        //logic of downvoting
+                        const upvoted = JSON.parse(req.body.upvoted).filter(user => user === curr_user)
+                        const downvoted = JSON.parse(req.body.downvoted).filter(user => user === curr_user)
+                        
+                        if (downvoted.length > 0) {
+                            review.votes = review.votes + 1
+                            review.downvoted = JSON.parse(req.body.downvoted).filter(user => user != curr_user)
+                        } else if (upvoted.length > 0) {
+                            review.votes = review.votes - 2
+                            review.downvoted.push(curr_user)
+                            review.upvoted = JSON.parse(req.body.upvoted).filter(user => user != curr_user)
+                        } else if (downvoted.length == 0) {
+                            review.votes = review.votes - 1
+                            review.downvoted.push(curr_user)
+                        }
+                        reviews[req.body.name] = review
+                        results.reviews = reviews
+                        db.collection('data').updateOne({ reviews: { $exists: true } }, { $set: { reviews: results.reviews } })
                     }
-                    reviews[req.body.name] = review
-                    results.reviews = reviews
-                    db.collection('data').updateOne({ reviews: { $exists: true } }, { $set: { reviews: results.reviews } })
                 })
                 .then(ignore => {
                     res.redirect(`/reviews/${req.body.name}`)
