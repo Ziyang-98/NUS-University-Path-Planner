@@ -1,11 +1,13 @@
 <h3>Available Guides</h3>
 <ul class="reviews">
     <% const revArr = Object.keys(reviews) %>
+    <% revArr.sort((key1, key2) => {return reviews[key2].votes - reviews[key1].votes}) %>
     <% for(key of revArr) {%>
         <% const link = '/reviews/' + reviews[key].name %>
         <form action='<%= link %>' method="POST">
             <h2><%= reviews[key].title %></h2>
             <p><%= reviews[key].desc %></p>
+            <p>Votes: <%= reviews[key].votes %></p>
 
             <input type="hidden" name="name" value=<%- reviews[key].name %>>
             <input type="hidden" name="moduleList" value=<%- JSON.stringify(reviews[key].moduleList); %>>

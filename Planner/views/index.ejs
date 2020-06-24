@@ -48,11 +48,20 @@
     </form>
     <br />
 
+    <form action="/submit-review" method="POST">
+        <input type="hidden" name="name" value=<%- name %>>
+        <input type="hidden" name="moduleList" value=<%- JSON.stringify(modules); %>>
+        <button type="submit">Export your planner as a guide!</button>
+    </form>
+
+    <br />
+    <button onclick="location.href = '/reviews'">View other guides by other users!</button>
+
     <h3>Modules included</h3>
     <ul class="modules">
         <% const modArr = Object.keys(modules) %>
         <% modArr.sort() %>
-        <% for(const key of modArr) {%>
+        <% for(key of modArr) {%>
         <h5><%= key.slice(0, 5) + ' semester ' + key.slice(5, 6) %></h5>
             <span><%= modules[key] %></span>
         <% }%>
