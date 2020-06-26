@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
-import Rating from "@material-ui/lab/Rating";
 import Container from "@material-ui/core/Container";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import ThumbDownIcon from "@material-ui/icons/ThumbDown";
@@ -14,16 +13,21 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     alignItems: "center",
   },
-  rating: {
+  thumbsup: {
     float: "left",
   },
-  ratingValue: {
+  value: {
+    float: "left",
+    marginLeft: theme.spacing(1),
+  },
+
+  thumbsdown: {
     float: "left",
     marginLeft: theme.spacing(1),
   },
   upvote: {
     float: "left",
-    marginLeft: theme.spacing(4),
+    marginLeft: theme.spacing(2),
   },
   downvote: {
     float: "left",
@@ -55,19 +59,20 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function RatingBar({
-  votes,
+  noOfUpvotes,
+  noOfDownvotes,
   upvote,
   downvote,
   upvotedNames,
   downvotedNames,
 }) {
-  console.log(votes);
-  const value =
-    upvotedNames.length === 0 && downvotedNames.length === 0
-      ? 0
-      : (upvotedNames.length / (upvotedNames.length + downvotedNames.length)) *
-        5;
-
+  // const value =
+  //   upvotedNames.length === 0 && downvotedNames.length === 0
+  //     ? 0
+  //     : (upvotedNames.length / (upvotedNames.length + downvotedNames.length)) *
+  //       5;
+  const upvotes = noOfUpvotes;
+  const downvotes = noOfDownvotes;
   const classes = useStyles();
   const [upvoted, setUpvote] = React.useState(false);
   const [downvoted, setDownvote] = React.useState(false);
@@ -77,11 +82,17 @@ export default function RatingBar({
       if (upvotedNames.includes(auth0Client.getProfile().name)) {
         setUpvote(true);
       }
+    }
+  }, [upvotedNames]);
+
+  useEffect(() => {
+    if (auth0Client.isAuthenticated()) {
       if (downvotedNames.includes(auth0Client.getProfile().name)) {
         setDownvote(true);
       }
     }
-  }, [upvotedNames, downvotedNames]);
+  }, [downvotedNames]);
+
   const handleUpvote = () => {
     if (!upvoted) {
       setUpvote(true);
@@ -104,15 +115,21 @@ export default function RatingBar({
 
   return (
     <Container width="auto" className={classes.root}>
-      <div className={classes.rating}>
-        <Rating name="read-only" value={value} precision={0.1} readOnly />
+      <div className={classes.thumbsup}>
+        <ThumbUpIcon />
       </div>
-      <div className={classes.ratingValue}>
-        <Typography component="span">
-          Score: {votes} Total votes:{" "}
-          {upvotedNames.length + downvotedNames.length}
-        </Typography>
+
+      <div className={classes.value}>
+        <Typography component="span">{upvotes}</Typography>
       </div>
+      <div className={classes.thumbsdown}>
+        <ThumbDownIcon />
+      </div>
+
+      <div className={classes.value}>
+        <Typography component="span">{downvotes}</Typography>
+      </div>
+
       <div className={classes.upvote}>
         <Button
           variant="contained"

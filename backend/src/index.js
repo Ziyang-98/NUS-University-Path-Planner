@@ -196,98 +196,6 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true }).then(
         });
     });
 
-    /*
-    app.get("/Planner/users/:name", (req, res) => {
-      
-      const date = new Date();
-      const month = date.getMonth();
-
-      const AY = req.body.AY ? req.body.AY : "19/20";
-
-      const semester = req.body.semester
-        ? req.body.semester
-        : month > 4
-        ? "2"
-        : "1";
-
-      db.collection("data")
-        .findOne({ users: { $exists: true } })
-        .then((results) => {
-          //this block checks if user has a moduleList for current AY/sem
-          //and creates one if it does not
-          const user = results.users[req.params.name];
-          const moduleList = user.moduleList;
-          const id = AY + semester;
-          if (!moduleList.hasOwnProperty(id)) {
-            moduleList[id] = [];
-            results.users[req.params.name] = user;
-          }
-          db.collection("data").updateOne(
-            { users: { $exists: true } },
-            { $set: { users: results.users } }
-          );
-          return {
-            moduleList: moduleList,
-            AY: AY,
-            semester: semester,
-          };
-        }) //we then pass the data to render all the modules in the user's moduleList
-        .then((data) => {
-          db.collection("data")
-            .findOne({ modules: { $exists: true } })
-            .then((results) => {
-              const year =
-                "20" + data.AY.slice(0, 2) + "-20" + data.AY.slice(3, 5);
-              if (!results) {
-                //if modules document not initialised yet
-                const modules = {};
-                //fetch the data from the corresponding year
-                fetch(`https://api.nusmods.com/v2/${year}/moduleList.json`)
-                  .then((response) => response.json())
-                  .then((data) => {
-                    const moduleList = {};
-                    for (module of data) {
-                      const name = module.moduleCode;
-                      moduleList[name] = module;
-                    }
-                    modules[AY] = moduleList;
-                    console.log(Object.keys(modules));
-                    db.collection("data").insertOne({ modules: modules });
-                  });
-              } else if (!results["modules"].hasOwnProperty(AY)) {
-                //no module list for current year
-                const modules = results.modules;
-                //fetch the data from the corresponding year
-                fetch(`https://api.nusmods.com/v2/${year}/moduleList.json`)
-                  .then((response) => response.json())
-                  .then((data) => {
-                    const moduleList = {};
-                    for (module of data) {
-                      const name = module.moduleCode;
-                      moduleList[name] = module;
-                    }
-                    modules[AY] = moduleList;
-                    db.collection("data").updateOne(
-                      { modules: { $exists: true } },
-                      { $set: { modules: modules } }
-                    );
-                  });
-              }
-            })
-            .then((ignore) => {
-              //no input from prev
-              const planner = {
-                name: req.params.name,
-                modules: data.moduleList,
-                AY: AY,
-                semester: semester,
-              };
-              res.send(planner);
-            });
-        });
-    });
-    */
-
     // Initialize data based on user, then redirects to get the data from user
     // req format =  {name: "Ziyang Lim"} etc
     app.post("/Planner/name", (req, res) => {
@@ -317,7 +225,6 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true }).then(
           }
         })
         .then(res.send())
-        //redirect(`/Planner/users/${req.body.name}`))
         .catch((err) => console.error(err));
     });
 
@@ -405,76 +312,6 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true }).then(
         .catch((err) => console.error(err));
     });
 
-    /*
-    app.post("/Planner/users/:name", (req, res) => {
-      db.collection("data")
-        .findOne({ users: { $exists: true } })
-        .then((results) => {
-          //this block checks if user has a moduleList for current AY/sem
-          //and creates one if it does not
-          const user = results.users[req.params.name];
-          const moduleList = user.moduleList;
-          const id = req.body.AY + req.body.semester;
-          if (!moduleList.hasOwnProperty(id)) {
-            moduleList[id] = [];
-            results.users[req.body.name] = user;
-          }
-          db.collection("data").updateOne(
-            { users: { $exists: true } },
-            { $set: { users: results.users } }
-          );
-          return {
-            data: results,
-            AY: req.body.AY,
-            semester: req.body.semester,
-          };
-        })
-        .then((data) => {
-          //then we find the module list for current AY sem
-          //check if module input
-          //if have then update that module list
-          //render accordingly
-          const date = new Date();
-          const month = date.getMonth();
-
-          const AY = data.AY ? data.AY : "19/20";
-          const semester = data.semester
-            ? data.semester
-            : month > 4
-            ? "2"
-            : "1";
-          const id = AY + semester;
-
-          const user = data.data.users[req.params.name];
-          const moduleList = user.moduleList[id];
-
-          //if there is a module to be inserted
-          if (req.body.module) {
-            //if current year has not had this module yet
-            if (!moduleList.includes(req.body.module)) {
-              moduleList.push(req.body.module);
-              data.data.users[req.body.name] = user;
-              db.collection("data").updateOne(
-                { users: { $exists: true } },
-                { $set: { users: data.data.users } }
-              );
-            }
-          }
-
-          res.send();
-          
-          res.render("index.ejs", {
-            name: req.body.name,
-            modules: data.data.users[req.body.name].moduleList,
-            AY: AY,
-            semester: semester,
-          });
-          
-        })
-        .catch((err) => console.error(err));
-    });
-    */
-
     // Delete academic year from the current list of module of a user
     // req format: {name: , AY }
     app.post("/Planner/deleteYear", (req, res) => {
@@ -550,11 +387,6 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true }).then(
           res.send({
             reviews: results.reviews,
           });
-          /*
-          res.render("reviews.ejs", {
-            reviews: results.reviews,
-          });
-          */
         });
     });
 
@@ -565,18 +397,14 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true }).then(
         .then((results) => {
           reviews = results.reviews;
           const review = reviews[req.params.name];
-          /*
-          res.render("review-template.ejs", {
-            review: review,
-          });
-          */
           res.send({
             name: review.name,
             moduleList: review.moduleList,
             title: review.title,
             major: review.major,
             description: review.description,
-            votes: review.votes,
+            upvotes: review.upvotes,
+            downvotes: review.downvotes,
             upvoted: review.upvoted,
             downvoted: review.downvoted,
           });
@@ -596,7 +424,8 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true }).then(
             title: req.body.title,
             major: req.body.major,
             description: req.body.description,
-            votes: 0,
+            upvotes: 0,
+            downvotes: 0,
             upvoted: [],
             downvoted: [],
           };
@@ -631,18 +460,19 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true }).then(
 
           //if user has previously upvoted
           if (upvoted.includes(curr_user)) {
-            review.votes = review.votes - 1;
+            review.upvotes = review.upvotes - 1;
             review.upvoted = req.body.upvoted.filter(
               (user) => user !== curr_user
             );
           } else if (downvoted.includes(curr_user)) {
-            review.votes = review.votes + 2;
+            review.upvotes = review.upvotes + 1;
+            review.downvotes = review.downvotes - 1;
             review.upvoted.push(curr_user);
             review.downvoted = req.body.downvoted.filter(
               (user) => user !== curr_user
             );
           } else {
-            review.votes = review.votes + 1;
+            review.upvotes = review.upvotes + 1;
             review.upvoted.push(curr_user);
           }
 
@@ -662,7 +492,7 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true }).then(
     });
 
     // req format: {name: upvoted: downvoted:}
-    app.post("/downvote/:username", (req, res) => {
+    app.post("/reviews/downvote/:username", (req, res) => {
       db.collection("data")
         .findOne({ reviews: { $exists: true } })
         .then((results) => {
@@ -675,18 +505,19 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true }).then(
           const downvoted = req.body.downvoted;
 
           if (downvoted.includes(curr_user)) {
-            review.votes = review.votes + 1;
+            review.downvotes = review.downvotes - 1;
             review.downvoted = req.body.downvoted.filter(
               (user) => user !== curr_user
             );
           } else if (upvoted.includes(curr_user)) {
-            review.votes = review.votes - 2;
+            review.downvotes = review.downvotes + 1;
+            review.upvotes = review.upvotes - 1;
             review.downvoted.push(curr_user);
             review.upvoted = req.body.upvoted.filter(
               (user) => user !== curr_user
             );
           } else {
-            review.votes = review.votes - 1;
+            review.downvotes = review.downvotes + 1;
             review.downvoted.push(curr_user);
           }
           reviews[req.body.name] = review;
@@ -697,36 +528,7 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true }).then(
           );
           res.send();
         });
-      /* No need to redirect
-        .then((ignore) => {
-          res.redirect(`/reviews/${req.body.name}`);
-        });
-        */
     });
-
-    // app.post("/reviews/:name", (req, res) => {
-    //   const review = {
-    //     name: req.body.name,
-    //     moduleList: JSON.parse(req.body.moduleList),
-    //     title: req.body.title,
-    //     desc: req.body.desc,
-    //     votes: req.body.votes,
-    //     upvoted: JSON.parse(req.body.upvoted),
-    //     downvoted: JSON.parse(req.body.downvoted),
-    //   };
-    //   /*
-    //   res.render("review-template.ejs", {
-    //     review: review,
-    //   });
-    //   */
-    // });
-
-    // app.post("/submit-review", (req, res) => {
-    //   res.render("submit-review.ejs", {
-    //     name: req.body.name,
-    //     moduleList: JSON.parse(req.body.moduleList),
-    //   });
-    // });
   }
 );
 

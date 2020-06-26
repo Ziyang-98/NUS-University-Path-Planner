@@ -18,42 +18,18 @@ class Planner extends Component {
     };
   }
 
-  /*
-  async componentDidMount() {
-    console.log(auth0Client.isAuthenticated());
-    
-    if (auth0Client.isAuthenticated()) {
-      const username = auth0Client.getProfile().name;
-      const userData = (
-        await axios.get("http://localhost:8081/Planner/name", {
-          name: username,
-        })
-      ).data;
-      this.setState(userData);
-    }
-    
-  }
-  */
-
   async componentDidUpdate() {
     if (auth0Client.isAuthenticated() && this.state.userData === null) {
       const username = auth0Client.getProfile().name;
       await axios.post(`http://localhost:8081/Planner/name`, {
         name: username,
       });
-      /*
-      console.log("before deleting module");
-      await axios.post(`http://localhost:8081/Planner/deleteYear`, {
-        name: username,
-        AY: "AY19/20",
-        semester: "1",
-      });
-      console.log("after deleting module");
-*/
+
       const data = await axios.get(
         `http://localhost:8081/Planner/users/${username}`
       );
       const userData = data.data;
+      console.log(userData);
       this.setState({ userData });
     } else if (this.state.update) {
       await this.refreshTable();

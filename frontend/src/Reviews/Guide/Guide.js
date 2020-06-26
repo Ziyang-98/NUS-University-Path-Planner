@@ -15,7 +15,8 @@ class Guide extends Component {
       title: "",
       major: "",
       description: "",
-      votes: 0,
+      upvotes: 0,
+      downvotes: 0,
       upvoted: [],
       downvoted: [],
     };
@@ -29,40 +30,40 @@ class Guide extends Component {
     const title = review.title;
     const major = review.major;
     const description = review.description;
-    const votes = review.votes;
+    const upvotes = review.upvotes;
+    const downvotes = review.downvotes;
     const upvoted = review.upvoted;
     const downvoted = review.downvoted;
-
+    console.log(review);
     this.setState({
       name,
       moduleList,
       title,
       major,
       description,
-      votes,
+      upvotes,
+      downvotes,
       upvoted,
       downvoted,
     });
   }
 
-  async refreshGuide() {
+  async refreshVotes() {
+    console.log("refreshed");
+
     const data = await axios.get(
       `http://localhost:8081/reviews/${this.state.name}`
     );
     const review = data.data;
-    const moduleList = review.moduleList;
-    const title = review.title;
-    const major = review.major;
-    const description = review.description;
-    const votes = review.votes;
+    console.log(review);
+
+    const upvotes = review.upvotes;
+    const downvotes = review.downvotes;
     const upvoted = review.upvoted;
     const downvoted = review.downvoted;
     this.setState({
-      moduleList,
-      title,
-      major,
-      description,
-      votes,
+      upvotes,
+      downvotes,
       upvoted,
       downvoted,
     });
@@ -74,16 +75,16 @@ class Guide extends Component {
       upvoted: this.state.upvoted,
       downvoted: this.state.downvoted,
     });
-    await this.refreshGuide();
+    await this.refreshVotes();
   }
 
   async downvote(username) {
-    await axios.post(`http://localhost:8081/downvote/${username}`, {
+    await axios.post(`http://localhost:8081/reviews/downvote/${username}`, {
       name: this.state.name,
       upvoted: this.state.upvoted,
       downvoted: this.state.downvoted,
     });
-    await this.refreshGuide();
+    await this.refreshVotes();
   }
 
   render() {
@@ -95,7 +96,8 @@ class Guide extends Component {
           major={this.state.major}
         />
         <RatingBar
-          votes={this.state.votes}
+          noOfUpvotes={this.state.upvotes}
+          noOfDownvotes={this.state.downvotes}
           upvote={this.upvote.bind(this)}
           downvote={this.downvote.bind(this)}
           upvotedNames={this.state.upvoted}

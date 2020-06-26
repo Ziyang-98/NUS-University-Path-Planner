@@ -13,6 +13,8 @@ import Rating from "@material-ui/lab/Rating";
 import Pagination from "@material-ui/lab/Pagination";
 import SentimentVeryDissatisfiedIcon from "@material-ui/icons/SentimentVeryDissatisfied";
 import axios from "axios";
+import ThumbUpIcon from "@material-ui/icons/ThumbUp";
+import ThumbDownIcon from "@material-ui/icons/ThumbDown";
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
@@ -54,6 +56,10 @@ const useStyles = makeStyles((theme) => ({
   cardContent: {
     flexGrow: 1,
   },
+  cardActions: {
+    display: "flex",
+    alignItems: "baseline",
+  },
   pagination: {
     display: "flex",
     justifyContent: "center",
@@ -62,6 +68,12 @@ const useStyles = makeStyles((theme) => ({
   },
   reviews: {
     fontWeight: 500,
+  },
+  votes: {
+    marginLeft: theme.spacing(2),
+  },
+  icons: {
+    marginLeft: theme.spacing(1),
   },
 }));
 
@@ -137,13 +149,13 @@ export default function Reviews() {
                         <Typography>By {review.name}</Typography>
                         <Typography>Majoring in {review.major}</Typography>
                       </CardContent>
-                      <CardActions>
+                      <CardActions className={classes.cardActions}>
                         <Link to={`/Guides/${review.name}`}>
                           <Button size="small" color="primary">
                             View
                           </Button>
                         </Link>
-                        <Rating
+                        {/* <Rating
                           name="read-only"
                           value={
                             review.upvoted.length === 0 &&
@@ -156,7 +168,23 @@ export default function Reviews() {
                           }
                           precision={0.1}
                           readOnly
-                        />
+                        /> */}
+                        <div className={classes.votes}>
+                          <ThumbUpIcon className={classes.icons} />
+                          <Typography
+                            className={classes.icons}
+                            component="span"
+                          >
+                            {review.upvotes}
+                          </Typography>
+                          <ThumbDownIcon className={classes.icons} />
+                          <Typography
+                            className={classes.icons}
+                            component="span"
+                          >
+                            {review.downvotes}
+                          </Typography>
+                        </div>
                       </CardActions>
                     </Card>
                   </Grid>
