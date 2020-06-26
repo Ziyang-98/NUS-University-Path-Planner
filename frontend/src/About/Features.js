@@ -43,7 +43,6 @@ const useStyles = makeStyles((theme) => ({
     float: "right",
     height: "inherit",
     backgroundColor: "#f9f9f9",
-    height: "inherit",
     width: "70%",
   },
   imageContainer: {
@@ -102,7 +101,11 @@ export default function NestedList() {
         <Typography variant="subtitle1">
           <Box className={classes.infoBox}>
             <Box className={classes.imageContainer}>
-              <img className={classes.images} src={PlannerPic} />
+              <img
+                className={classes.images}
+                alt="Screenshot of planner page"
+                src={PlannerPic}
+              />
             </Box>
             <Box className={classes.infoContainer}>
               The planner interface allows user to add modules based on user's
@@ -131,7 +134,11 @@ export default function NestedList() {
         <Typography variant="subtitle1">
           <Box className={classes.infoBox}>
             <Box className={classes.imageContainer}>
-              <img className={classes.images} src={ReviewsPic} />
+              <img
+                className={classes.images}
+                alt="Screenshot of reviews page"
+                src={ReviewsPic}
+              />
             </Box>
             <Box className={classes.infoContainer}>
               The reviews / guides section features planners made my users. It
@@ -160,7 +167,11 @@ export default function NestedList() {
         <Typography variant="subtitle1">
           <Box className={classes.infoBox}>
             <Box className={classes.imageContainer}>
-              <img className={classes.images} src={ForumPic} />
+              <img
+                className={classes.images}
+                alt="Screenshot of forums page"
+                src={ForumPic}
+              />
             </Box>
             <Box className={classes.infoContainer}>
               The forum is a Q&A platforum for users to post/answer any queries

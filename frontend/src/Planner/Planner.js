@@ -6,6 +6,7 @@ import Table from "./PlannerTable/PlannerTable";
 import auth0Client from "../Auth";
 import axios from "axios";
 import Typography from "@material-ui/core/Typography";
+import ExportButton from "./ExportPlanner/ExportButton";
 
 class Planner extends Component {
   constructor(props) {
@@ -87,6 +88,19 @@ class Planner extends Component {
     this.setState({ update });
   }
 
+  async exportPlanner(title, major, description) {
+    const username = this.state.userData.name;
+    const moduleList = this.state.userData.moduleList;
+    console.log("in export Planner");
+    console.log(description);
+    await axios.post(`http://localhost:8081/reviews/${username}`, {
+      moduleList: moduleList,
+      title: title,
+      major: major,
+      description: description,
+    });
+  }
+
   //Work in progress
   async deleteYear(year) {
     await axios.post(`http://localhost:8081/Planner/deleteYear`, {
@@ -147,6 +161,7 @@ class Planner extends Component {
                   deleteYear={this.deleteYear.bind(this)}
                   deleteModule={this.deleteModule.bind(this)}
                 />
+                <ExportButton exportPlanner={this.exportPlanner.bind(this)} />
               </div>
             )}
           </div>

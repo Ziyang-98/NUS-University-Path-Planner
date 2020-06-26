@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { Route, withRouter } from "react-router-dom";
-import Album from "./Album/Album";
 import Callback from "./Callback";
 import auth0Client from "./Auth";
 import AppBar from "./AppBar/AppBar";
@@ -12,7 +11,8 @@ import About from "./About/About";
 import Footer from "./Footer/Footer";
 import Planner from "./Planner/Planner";
 import Home from "./Home/Home";
-import ReviewsGuides from "./Reviews/Reviews";
+import ReviewsGuides from "./Reviews/ReviewsHome";
+import GuidePage from "./Reviews/Guide/Guide";
 
 class App extends Component {
   constructor(props) {
@@ -44,6 +44,7 @@ class App extends Component {
         <Route path="/About" component={About} />
         <Route path="/Planner" component={Planner} />
         <Route path="/ReviewsGuides" component={ReviewsGuides} />
+        <Route path="/Guides/:name" component={GuidePage} />
         <Route path="/Forum" component={Questions} />
         <Route path="/question/:questionId" component={Question} />
         <SecuredRoute

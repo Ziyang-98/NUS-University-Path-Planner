@@ -14,8 +14,6 @@ import Typography from "@material-ui/core/Typography";
 import Paper from "@material-ui/core/Paper";
 import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
-import DeleteIcon from "@material-ui/icons/Delete";
-import ClearIcon from "@material-ui/icons/Clear";
 
 const useRowStyles = makeStyles({
   root: {
@@ -28,7 +26,7 @@ const useRowStyles = makeStyles({
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "60%",
-    marginTop: theme.spacing(10),
+    marginTop: theme.spacing(5),
     marginBottom: theme.spacing(5),
     marginLeft: "auto",
     marginRight: "auto",
@@ -50,7 +48,7 @@ function createAYData(year, modulesPlanned, yearCredits, sem1, sem2, st1, st2) {
 }
 
 function Row(props) {
-  const { row, deleteYear, deleteModule } = props;
+  const { row } = props;
   const [open, setOpen] = React.useState(false);
   const classes = useRowStyles();
   return (
@@ -70,15 +68,6 @@ function Row(props) {
         </TableCell>
         <TableCell align="right">{row.modulesPlanned}</TableCell>
         <TableCell align="right">{row.yearCredits}</TableCell>
-        <TableCell align="right">
-          <IconButton
-            aria-label="delete row"
-            size="small"
-            onClick={() => deleteYear(row.year)}
-          >
-            <DeleteIcon />
-          </IconButton>
-        </TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -102,7 +91,6 @@ function Row(props) {
                       <TableCell>Module Code</TableCell>
                       <TableCell>Module Name</TableCell>
                       <TableCell align="right">Module Credit</TableCell>
-                      <TableCell align="right">Delete</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -114,15 +102,6 @@ function Row(props) {
                         <TableCell>{sem1Row.moduleTitle}</TableCell>
                         <TableCell align="right">
                           {sem1Row.moduleCredits}
-                        </TableCell>
-                        <TableCell align="right">
-                          <IconButton
-                            aria-label="delete module"
-                            size="small"
-                            onClick={() => deleteModule(row.year, "1", sem1Row)}
-                          >
-                            <ClearIcon />
-                          </IconButton>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -149,7 +128,6 @@ function Row(props) {
                       <TableCell>Module Code</TableCell>
                       <TableCell>Module Name</TableCell>
                       <TableCell align="right">Module Credit</TableCell>
-                      <TableCell align="right">Delete</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -161,15 +139,6 @@ function Row(props) {
                         <TableCell>{sem2Row.moduleTitle}</TableCell>
                         <TableCell align="right">
                           {sem2Row.moduleCredits}
-                        </TableCell>
-                        <TableCell align="right">
-                          <IconButton
-                            aria-label="delete module"
-                            size="small"
-                            onClick={() => deleteModule(row.year, "2", sem2Row)}
-                          >
-                            <ClearIcon />
-                          </IconButton>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -196,7 +165,6 @@ function Row(props) {
                       <TableCell>Module Code</TableCell>
                       <TableCell>Module Name</TableCell>
                       <TableCell align="right">Module Credit</TableCell>
-                      <TableCell align="right">Delete</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -208,15 +176,6 @@ function Row(props) {
                         <TableCell>{st1Row.moduleTitle}</TableCell>
                         <TableCell align="right">
                           {st1Row.moduleCredits}
-                        </TableCell>
-                        <TableCell align="right">
-                          <IconButton
-                            aria-label="delete module"
-                            size="small"
-                            onClick={() => deleteModule(row.year, "3", st1Row)}
-                          >
-                            <ClearIcon />
-                          </IconButton>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -243,7 +202,6 @@ function Row(props) {
                       <TableCell>Module Code</TableCell>
                       <TableCell>Module Name</TableCell>
                       <TableCell align="right">Module Credit</TableCell>
-                      <TableCell align="right">Delete</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -255,15 +213,6 @@ function Row(props) {
                         <TableCell>{st2Row.moduleTitle}</TableCell>
                         <TableCell align="right">
                           {st2Row.moduleCredits}
-                        </TableCell>
-                        <TableCell align="right">
-                          <IconButton
-                            aria-label="delete module"
-                            size="small"
-                            onClick={() => deleteModule(row.year, "4", st2Row)}
-                          >
-                            <ClearIcon />
-                          </IconButton>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -383,7 +332,7 @@ function extractData(moduleList) {
   return rows;
 }
 
-const PlannerTable = ({ moduleList, deleteYear, deleteModule }) => {
+const PlannerTable = ({ moduleList }) => {
   const classes = useStyles();
   const rows = extractData(moduleList);
   return (
@@ -401,12 +350,7 @@ const PlannerTable = ({ moduleList, deleteYear, deleteModule }) => {
           </TableHead>
           <TableBody>
             {rows.map((row) => (
-              <Row
-                key={row.year}
-                row={row}
-                deleteYear={deleteYear}
-                deleteModule={deleteModule}
-              />
+              <Row key={row.year} row={row} />
             ))}
           </TableBody>
         </Table>
