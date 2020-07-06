@@ -245,7 +245,7 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true }).then(
         .findOne({ users: { $exists: true } })
         .then((results) => {
           const user = results.users[req.body.name];
-          const AY = "AY" + req.body.AY;
+          const AY = req.body.AY;
           const moduleList = user.moduleList;
           //User input validation
           if (
