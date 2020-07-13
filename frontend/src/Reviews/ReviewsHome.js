@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import useMountEffect from "react";
 import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
@@ -10,13 +9,12 @@ import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import Rating from "@material-ui/lab/Rating";
 import Pagination from "@material-ui/lab/Pagination";
 import SentimentVeryDissatisfiedIcon from "@material-ui/icons/SentimentVeryDissatisfied";
 import axios from "axios";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import ThumbDownIcon from "@material-ui/icons/ThumbDown";
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Link } from "react-router-dom";
 import Tags from "./Tags";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Autocomplete from "@material-ui/lab/Autocomplete";
@@ -24,7 +22,6 @@ import TextField from "@material-ui/core/TextField";
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import { FormControlLabel } from "@material-ui/core";
-// import FilterReviews from "./FilterReviews";
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -102,11 +99,9 @@ export default function Reviews() {
   const [hasSecondDegree, setHasSecondDegree] = useState(false);
   const [secondDegree, setSecondDegree] = useState("");
   const [typeOfSecondDegree, setTypeOfSecondDegree] = useState("");
-  const [hasHallRC, setHasHallRC] = useState(false);
   const [hallRC, setHallRC] = useState("");
   const [baseReviews, setBaseReviews] = useState([]);
   const [degrees, setDegrees] = useState([]);
-  const [test, setTest] = useState("");
 
   //----- Pagination --------//
   const [numOfPages, setNumOfPages] = useState(1);
@@ -146,21 +141,23 @@ export default function Reviews() {
           denom2 = denom2 === 0 ? 1 : denom2;
           return (r2.upvotes / denom2) - (r1.upvotes / denom1);
         })
+        const data = await axios.get(
+          `http://localhost:8081/degrees`
+        );
+        
+        setDegrees(data.data.degrees);
         setBaseReviews(result);
         setReviews(result);
         setNumOfPages(Math.ceil(result.length / reviewsPerPage));
         setPagedReviews(result.slice(0, reviewsPerPage));
         
-        const degrees = await axios.get(
-          `http://localhost:8081/degrees`
-        ).then(data => setDegrees(data.data.degrees));
         setMounted(true);
       }
     }
     fetchData();
   }
 
-  useEffect(fn, [test]);
+  useEffect(fn, []);
 
 
   const handleMajorChange = (value) => {
@@ -183,9 +180,6 @@ export default function Reviews() {
     setSecondDegree(event.target.value);
   };
 
-  const handleHasHallRC = (event) => {
-    setHasHallRC(event.target.checked)
-  }
 
   const handleHallRCChange = (value) => {
     setHallRC(value);
@@ -194,6 +188,9 @@ export default function Reviews() {
   const filterReviews = (tagsToFilter) => {
     let filteredReviews = [...baseReviews];
     for (let tag of tagsToFilter) {
+      if (tag === null) {
+        continue;
+      }
       filteredReviews = filteredReviews.filter((review) => {
         return review.tags.includes(tag);
       })
@@ -286,9 +283,14 @@ export default function Reviews() {
               rowsMax={4}
               value={secondDegree}
               onChange={handleSecondDegree}
-              variant="outlined"
+              disabled={!hasSecondDegree}
+              variant={hasSecondDegree ? "outlined" : "filled"}
             />
-            <RadioGroup name="typeOfSecondDegree" valueSelected={typeOfSecondDegree} onChange={handleHasSecondDegree}>
+            <RadioGroup
+             name="typeOfSecondDegree" 
+             valueSelected={typeOfSecondDegree} 
+             onChange={handleHasSecondDegree}
+             >
               <FormControlLabel
                 value="Double Degree"
                 control={<Radio color="primary" />}
