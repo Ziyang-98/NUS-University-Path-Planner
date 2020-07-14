@@ -15,13 +15,8 @@ const router = express.Router();
 const connectionString =
   "mongodb+srv://pythonSnakes:753951@cluster0-gwy8r.gcp.mongodb.net/mod-planner-users?retryWrites=true&w=majority";
 
-/*----------------Q&A App----------------*/
-
 // define the Express app
 const app = express();
-
-// the database
-const questions = [];
 
 // enhance your app security with Helmet
 app.use(helmet());
@@ -34,25 +29,6 @@ app.use(cors());
 
 // log HTTP requests
 app.use(morgan("combined"));
-
-// retrieve all questions
-app.get("/Forum", (req, res) => {
-  const qs = questions.map((q) => ({
-    id: q.id,
-    title: q.title,
-    description: q.description,
-    answers: q.answers.length,
-  }));
-  res.send(qs);
-});
-
-// get a specific question
-app.get("/Forum/:id", (req, res) => {
-  const question = questions.filter((q) => q.id === parseInt(req.params.id));
-  if (question.length > 1) return res.status(500).send();
-  if (question.length === 0) return res.status(404).send();
-  res.send(question[0]);
-});
 
 const checkJwt = jwt({
   secret: jwksRsa.expressJwtSecret({
@@ -68,37 +44,7 @@ const checkJwt = jwt({
   algorithms: ["RS256"],
 });
 
-// insert a new question
-app.post("/Forum", checkJwt, (req, res) => {
-  const { title, description } = req.body;
-  const newQuestion = {
-    id: questions.length + 1,
-    title,
-    description,
-    answers: [],
-    author: req.user.name,
-  };
-  questions.push(newQuestion);
-  res.status(200).send();
-});
-
-// insert a new answer to a question
-app.post("/Forum/answer/:id", checkJwt, (req, res) => {
-  const { answer } = req.body;
-
-  const question = questions.filter((q) => q.id === parseInt(req.params.id));
-  if (question.length > 1) return res.status(500).send();
-  if (question.length === 0) return res.status(404).send();
-
-  question[0].answers.push({
-    answer,
-    author: req.user.name,
-  });
-
-  res.status(200).send();
-});
-
-// Planner side database
+//Database (MongoDB)
 MongoClient.connect(connectionString, { useUnifiedTopology: true }).then(
   (client) => {
     const db = client.db("mod-planner-users");
@@ -113,6 +59,393 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true }).then(
     app.use("/", router);
     app.use(express.static(__dirname + "/public"));
 
+    /*----------------Forums----------------*/
+    // retrieve questions
+    app.get("/Forum", (req, res) => {
+      db.collection("data")
+        .findOne({ questions: { $exists: true } })
+        .then((results) => {
+          //if database is not initialised yet
+          if (!results) {
+            const questions = { questions: [] };
+            db.collection("data").insertOne(questions);
+            res.send(questions.question);
+          }
+          const data = results.questions
+          res.send(data);
+        })
+        .catch((err) => console.error(err));
+    });
+
+    // get a specific question using indexing based on id
+    app.get("/Forum/:id", (req, res) => {
+      db.collection("data")
+        .findOne({ questions: { $exists: true } })
+        .then((results) => {
+          const questions = results.questions;
+          if (req.params.id < 0 || req.params.id > questions.length - 1) {
+            res.status(500).send();
+          }
+          res.send(questions[req.params.id]);
+        })
+    });
+
+    // insert a new question
+    app.post("/Forum", checkJwt, (req, res) => {
+      const { title, description, hasName, username } = req.body;
+      db.collection("data")
+        .findOne({ questions: { $exists: true } })
+        .then((results) => {
+          questions = results.questions;
+          const newQuestion = {
+            id: questions.length,
+            title,
+            description,
+            answers: [],
+            author: username,
+            name: hasName ? username : "Anonymous",
+            tags: req.body.tags,
+            upvotes: 0,
+            downvotes: 0,
+            upvoted: [],
+            downvoted: [],
+          };
+          questions.push(newQuestion);
+          db.collection("data").updateOne(
+            { questions: { $exists: true } },
+            { $set: { questions: questions } }
+          );
+        })
+        .then(res.status(200).send())
+        .catch((err) => console.error(err));
+    });
+
+    // insert a new answer to a question
+    app.post("/Forum/answer/:id", checkJwt, (req, res) => {
+      const { answer, hasName, username } = req.body;
+      db.collection("data")
+        .findOne({ questions: { $exists: true } })
+        .then((results) => {
+          const questions = results.questions;
+          if (req.params.id < 0 || req.params.id > questions.length - 1) {
+            res.status(500).send();
+          }
+          const answers = questions[req.params.id].answers;
+          answers.push({
+            id: answers.length,
+            answer,
+            author: username,
+            name: hasName ? username : "Anonymous",
+            upvotes: 0,
+            downvotes: 0,
+            upvoted: [],
+            downvoted: [],
+          })
+          db.collection("data").updateOne(
+            { questions: { $exists: true } },
+            { $set: { questions: questions } }
+          );
+        })
+        .then(res.status(200).send())
+    });
+
+    //-------- new code, upvote and downvote for question ------//
+    // req format: {name: upvoted: downvoted:}
+    app.post("/Forum/upvote/:username", (req, res) => {
+      db.collection("data")
+        .findOne({ questions: { $exists: true } })
+        .then((results) => {
+          questions = results.questions;
+          const curr_user = req.params.username;
+          const question = questions[req.body.id];
+          //logic of upvoting
+          const upvoted = req.body.upvoted;
+          const downvoted = req.body.downvoted;
+
+          //if user has previously upvoted
+          if (upvoted.includes(curr_user)) {
+            question.upvotes = question.upvotes - 1;
+            question.upvoted = req.body.upvoted.filter(
+              (user) => user !== curr_user
+            );
+          } else if (downvoted.includes(curr_user)) {
+            question.upvotes = question.upvotes + 1;
+            question.downvotes = question.downvotes - 1;
+            question.upvoted.push(curr_user);
+            question.downvoted = req.body.downvoted.filter(
+              (user) => user !== curr_user
+            );
+          } else {
+            question.upvotes = question.upvotes + 1;
+            question.upvoted.push(curr_user);
+          }
+
+          questions[req.body.name] = question;
+          results.questions = questions;
+          db.collection("data").updateOne(
+            { questions: { $exists: true } },
+            { $set: { questions: results.questions } }
+          );
+          res.send();
+        });
+      /* No need to redirect
+        .then((ignore) => {
+          res.redirect(`/reviews/${req.body.name}`);
+        });
+        */
+    });
+
+    // req format: {name: upvoted: downvoted:}
+    app.post("/Forum/downvote/:username", (req, res) => {
+      db.collection("data")
+        .findOne({ questions: { $exists: true } })
+        .then((results) => {
+          questions = results.questions;
+          const curr_user = req.params.username;
+          const question = questions[req.body.id];
+
+          //logic of downvoting
+          const upvoted = req.body.upvoted;
+          const downvoted = req.body.downvoted;
+
+          if (downvoted.includes(curr_user)) {
+            question.downvotes = question.downvotes - 1;
+            question.downvoted = req.body.downvoted.filter(
+              (user) => user !== curr_user
+            );
+          } else if (upvoted.includes(curr_user)) {
+            question.downvotes = question.downvotes + 1;
+            question.upvotes = question.upvotes - 1;
+            question.downvoted.push(curr_user);
+            question.upvoted = req.body.upvoted.filter(
+              (user) => user !== curr_user
+            );
+          } else {
+            question.downvotes = question.downvotes + 1;
+            question.downvoted.push(curr_user);
+          }
+          questions[req.body.name] = question;
+          results.questions = questions;
+          db.collection("data").updateOne(
+            { questions: { $exists: true } },
+            { $set: { questions: results.questions } }
+          );
+          res.send();
+        });
+    });
+
+    //Edits question
+    app.post("/Forum/edit/:questionId", (req, res) => {
+      const { title, description, hasName, tags } = req.body;
+      db.collection("data")
+        .findOne({ questions: { $exists: true } })
+        .then((results) => {
+          questions = results.questions;
+          question = questions[req.params.questionId]
+          
+          //editing the question
+          question.title = title;
+          question.description = description;
+          question.name = hasName ? question.author : "Anonymous";
+          question.tags = tags;
+
+          questions[req.params.id] = question;
+          db.collection("data").updateOne(
+            { questions: { $exists: true } },
+            { $set: { questions: questions } }
+          );
+        })
+        .then(res.status(200).send())
+        .catch((err) => console.error(err));
+    })
+
+    //Edits answer
+    app.post("/Forum/editAns/:questionId", (req, res) => {
+      console.log("editing")
+      const { newAnswer, answerId, hasName } = req.body;
+      db.collection("data")
+        .findOne({ questions: { $exists: true } })
+        .then((results) => {
+          questions = results.questions;
+          question = questions[req.params.questionId]
+          answer = question.answers[req.body.answerId]
+          //editing the question
+          answer.answer = newAnswer;
+          answer.name = hasName ? question.author : "Anonymous";
+          question.answers[req.body.answerId] = answer;
+          questions[req.params.id] = question;
+
+          db.collection("data").updateOne(
+            { questions: { $exists: true } },
+            { $set: { questions: questions } }
+          );
+        })
+        .then(res.status(200).send())
+        .catch((err) => console.error(err));
+    })
+
+    //---------- upvote downvote for ans ----------//
+    // req format: {name: upvoted: downvoted:}
+    app.post("/Forum/upvoteAns/:username", (req, res) => {
+      db.collection("data")
+        .findOne({ questions: { $exists: true } })
+        .then((results) => {
+          questions = results.questions;
+          const curr_user = req.params.username;
+          const question = questions[req.body.questionId];
+          const answer = question.answers[req.body.answerId]
+          //logic of upvoting
+          const upvoted = req.body.upvoted;
+          const downvoted = req.body.downvoted;
+
+          //if user has previously upvoted
+          if (upvoted.includes(curr_user)) {
+            answer.upvotes = answer.upvotes - 1;
+            answer.upvoted = req.body.upvoted.filter(
+              (user) => user !== curr_user
+            );
+          } else if (downvoted.includes(curr_user)) {
+            answer.upvotes = answer.upvotes + 1;
+            answer.downvotes = answer.downvotes - 1;
+            answer.upvoted.push(curr_user);
+            answer.downvoted = req.body.downvoted.filter(
+              (user) => user !== curr_user
+            );
+          } else {
+            answer.upvotes = answer.upvotes + 1;
+            answer.upvoted.push(curr_user);
+          }
+          question.answers[req.body.answerId] = answer;
+          questions[req.body.name] = question;
+          results.questions = questions;
+          db.collection("data").updateOne(
+            { questions: { $exists: true } },
+            { $set: { questions: results.questions } }
+          );
+          res.send();
+        });
+      /* No need to redirect
+        .then((ignore) => {
+          res.redirect(`/reviews/${req.body.name}`);
+        });
+        */
+    });
+
+    // req format: {name: upvoted: downvoted:}
+    app.post("/Forum/downvoteAns/:username", (req, res) => {
+      db.collection("data")
+        .findOne({ questions: { $exists: true } })
+        .then((results) => {
+          questions = results.questions;
+          const curr_user = req.params.username;
+          const question = questions[req.body.questionId];
+          const answer = question.answers[req.body.answerId];
+          //logic of downvoting
+          const upvoted = req.body.upvoted;
+          const downvoted = req.body.downvoted;
+
+          if (downvoted.includes(curr_user)) {
+            answer.downvotes = answer.downvotes - 1;
+            answer.downvoted = req.body.downvoted.filter(
+              (user) => user !== curr_user
+            );
+          } else if (upvoted.includes(curr_user)) {
+            answer.downvotes = answer.downvotes + 1;
+            answer.upvotes = answer.upvotes - 1;
+            answer.downvoted.push(curr_user);
+            answer.upvoted = req.body.upvoted.filter(
+              (user) => user !== curr_user
+            );
+          } else {
+            answer.downvotes = answer.downvotes + 1;
+            answer.downvoted.push(curr_user);
+          }
+
+          question.answers[req.body.answerId] = answer;
+          questions[req.body.name] = question;
+          results.questions = questions;
+          db.collection("data").updateOne(
+            { questions: { $exists: true } },
+            { $set: { questions: results.questions } }
+          );
+          res.send();
+        });
+    });
+
+    //-------------- Deleting ----------------//
+    //Deleting question
+    app.post("/Forum/delete/:questionId", (req, res) => {
+      db.collection("data")
+        .findOne({ questions: { $exists: true } })
+        .then((results) => {
+          questions = results.questions;
+          questions.map((qn, index) => {
+            if (index > req.params.questionId) {
+              qn.id = qn.id - 1;
+            }
+          })
+
+          questions.splice(req.params.questionId, 1);
+          console.log(questions)
+          db.collection("data").updateOne(
+            { questions: { $exists: true } },
+            { $set: { questions: questions } }
+          );
+        })
+        .then(res.status(200).send())
+        .catch((err) => console.error(err));
+    })
+
+    //Deleting answer from question
+    app.post("/Forum/deleteAns/:questionId", (req, res) => {
+      db.collection("data")
+        .findOne({ questions: { $exists: true } })
+        .then((results) => {
+          questions = results.questions;
+          question = questions[req.params.questionId];
+          answers = question.answers;
+          answers.map((ans, index) => {
+            if (index > req.body.answerId) {
+              ans.id = ans.id - 1;
+            }
+          })
+
+          answers.splice(req.params.questionId, 1);
+          question.answers = answers;
+          questions[req.params.questionId] = question;
+          console.log(questions)
+          db.collection("data").updateOne(
+            { questions: { $exists: true } },
+            { $set: { questions: questions } }
+          );
+        })
+        .then(res.status(200).send())
+        .catch((err) => console.error(err));
+    })
+
+    //---------- Deleting tag from question ------------//
+    app.post("/Forum/deleteTag/:questionId", (req, res) => {
+      db.collection("data")
+      .findOne({ questions: { $exists: true } })
+      .then((results) => {
+        const { tagId } = req.body;
+        questions = results.questions;
+        question = questions[req.params.questionId];
+        tags = question.tags;
+
+        tags.splice(tagId, 1);
+        
+        question.tags = tags;
+        questions[req.params.questionId] = question;
+        console.log(questions);
+        db.collection("data").updateOne(
+          { questions: { $exists: true } },
+          { $set: { questions: questions } }
+        );
+      })
+      .then(res.status(200).send())
+      .catch((err) => console.error(err));
+    })
     /*----------------Planner----------------*/
 
     // Fetches list of all the modules from  NUSMods API
@@ -245,7 +578,7 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true }).then(
         .findOne({ users: { $exists: true } })
         .then((results) => {
           const user = results.users[req.body.name];
-          const AY = "AY" + req.body.AY;
+          const AY = req.body.AY;
           const moduleList = user.moduleList;
           //User input validation
           if (

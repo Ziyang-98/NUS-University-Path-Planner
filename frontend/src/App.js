@@ -19,6 +19,7 @@ class App extends Component {
     super(props);
     this.state = {
       checkingSession: true,
+      username: "",
     };
   }
 
@@ -33,8 +34,13 @@ class App extends Component {
     } catch (err) {
       if (err.error !== "login_required") console.log(err.error);
     }
-    this.setState({ checkingSession: false });
+    localStorage.setItem("username", auth0Client.getProfile().name);
+    this.setState({
+      checkingSession: false,
+      username: auth0Client.getProfile().name,
+    });
   }
+
   render() {
     return (
       <div>
@@ -45,8 +51,18 @@ class App extends Component {
         <Route path="/Planner" component={Planner} />
         <Route path="/ReviewsGuides" component={ReviewsGuides} />
         <Route path="/Guides/:name" component={GuidePage} />
-        <Route path="/Forum" component={Questions} />
-        <Route path="/question/:questionId" component={Question} />
+        <Route path="/Forum" render={(props) => 
+        <Questions 
+          username= {this.state.username}
+          {...props} 
+        />} 
+          />
+        <Route path="/question/:questionId" render={(props) => 
+        <Question
+          username= {this.state.username}
+          {...props} 
+        />}
+          />
         <SecuredRoute
           path="/new-question"
           component={NewQuestion}
