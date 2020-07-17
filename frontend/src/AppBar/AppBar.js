@@ -24,7 +24,11 @@ export default function ButtonAppBar(props) {
 
   const signOut = () => {
     auth0Client.signOut();
-    props.history.replace("/");
+    this.props.history.replace("/");
+  };
+
+  const signIn = () => {
+    auth0Client.signIn();
   };
 
   return (
@@ -36,7 +40,7 @@ export default function ButtonAppBar(props) {
             Mod Planner
           </Typography>
           {!auth0Client.isAuthenticated() && (
-            <Button color="inherit" onClick={auth0Client.signIn}>
+            <Button color="inherit" onClick={() => signIn()}>
               Sign In
             </Button>
           )}

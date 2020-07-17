@@ -14,14 +14,10 @@ import SentimentVeryDissatisfiedIcon from "@material-ui/icons/SentimentVeryDissa
 import axios from "axios";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import ThumbDownIcon from "@material-ui/icons/ThumbDown";
-import { BrowserRouter as Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import Tags from "./Tags";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import Autocomplete from "@material-ui/lab/Autocomplete";
-import TextField from "@material-ui/core/TextField";
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import { FormControlLabel } from "@material-ui/core";
+import Filter from "./Filter";
+// import FilterReviews from "./FilterReviews";
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -48,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(4),
   },
   cardGrid: {
-    paddingTop: theme.spacing(8),
+    paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(8),
   },
   card: {
@@ -72,13 +68,7 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     marginBottom: theme.spacing(6),
   },
-  filter: {
-    paddingTop: theme.spacing(8),
-    paddingBottom: theme.spacing(8),
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
+
   reviews: {
     fontWeight: 500,
   },
@@ -95,11 +85,6 @@ export default function Reviews() {
   //const [rating, setRating] = useState(3);
   const [reviews, setReviews] = useState([]);
   const [mounted, setMounted] = useState(false);
-  const [major, setMajor] = useState("");
-  const [hasSecondDegree, setHasSecondDegree] = useState(false);
-  const [secondDegree, setSecondDegree] = useState("");
-  const [typeOfSecondDegree, setTypeOfSecondDegree] = useState("");
-  const [hallRC, setHallRC] = useState("");
   const [baseReviews, setBaseReviews] = useState([]);
   const [degrees, setDegrees] = useState([]);
 
@@ -108,22 +93,7 @@ export default function Reviews() {
   const [currPage, setCurrPage] = useState(1);
   const [pagedReviews, setPagedReviews] = useState([]);
   //Change this to change how many reviews displayed per page
-  const reviewsPerPage = 2;
-
-  const hallRCs = [
-    "Eusoff Hall",
-    "Kent Ridge Hall",
-    "King Edward VII Hall",
-    "Raffles Hall",
-    "Sheares Hall",
-    "Temasek Hall",
-    "PGP House",
-    "Ridge View Residential College (RVRC)",
-    "College of Alice and Peter Tan (CAPT)",
-    "Residential College 4 (RC4)",
-    "Tembusu College",
-    "University Scholars Programme (USP)"
-  ]
+  const reviewsPerPage = 9;
 
   // format of review in reviews: [name: , moduleList, title, major, tags,
   // description , votes, upvoted, downvoted]
@@ -135,96 +105,46 @@ export default function Reviews() {
         result.sort((r1, r2) => {
           let denom1 = r1.upvotes + r1.downvotes;
           let denom2 = r2.upvotes + r2.downvotes;
-          
+
           //preventing division by 0
           denom1 = denom1 === 0 ? 1 : denom1;
           denom2 = denom2 === 0 ? 1 : denom2;
-          return (r2.upvotes / denom2) - (r1.upvotes / denom1);
-        })
-        const data = await axios.get(
-          `http://localhost:8081/degrees`
-        );
-        
-        setDegrees(data.data.degrees);
+          return r2.upvotes / denom2 - r1.upvotes / denom1;
+        });
         setBaseReviews(result);
         setReviews(result);
         setNumOfPages(Math.ceil(result.length / reviewsPerPage));
         setPagedReviews(result.slice(0, reviewsPerPage));
-        
+
+        await axios
+          .get(`http://localhost:8081/degrees`)
+          .then((data) => setDegrees(data.data.degrees));
         setMounted(true);
       }
     }
     fetchData();
-  }
+  };
 
   useEffect(fn, []);
-
-
-  const handleMajorChange = (value) => {
-    setMajor(value);
-  };
-
-  const handleHasSecondDegree = (event) => {
-    const value = event.target.value;
-    if (value === "") {
-      setSecondDegree("");
-      setTypeOfSecondDegree("");
-      setHasSecondDegree(false);
-    } else {
-      setTypeOfSecondDegree(value);
-      setHasSecondDegree(true);
-    }
-  }
-
-  const handleSecondDegree = (event) => {
-    setSecondDegree(event.target.value);
-  };
-
-
-  const handleHallRCChange = (value) => {
-    setHallRC(value);
-  }
 
   const filterReviews = (tagsToFilter) => {
     let filteredReviews = [...baseReviews];
     for (let tag of tagsToFilter) {
-      if (tag === null) {
-        continue;
-      }
       filteredReviews = filteredReviews.filter((review) => {
         return review.tags.includes(tag);
-      })
+      });
     }
     setReviews(filteredReviews);
     setNumOfPages(Math.ceil(filteredReviews.length / reviewsPerPage));
     setPagedReviews(filteredReviews.slice(0, reviewsPerPage));
-  }
-
-  const handleFilter = (event) => {
-    event.preventDefault();
-    const tagsToFilter = [];
-    if (major !== "") {
-      tagsToFilter.push(major);
-    }
-    if (secondDegree !== "") {
-      tagsToFilter.push(secondDegree);
-    }
-    if (typeOfSecondDegree !== "") {
-      tagsToFilter.push(typeOfSecondDegree);
-    }
-    if (hallRC !== "") {
-      tagsToFilter.push(hallRC);
-    }
-    filterReviews(tagsToFilter);
-  }
+  };
 
   const handleReset = (event) => {
-    console.log("in reset")
     event.preventDefault();
     setReviews(baseReviews);
     setPagedReviews(baseReviews.slice(0, reviewsPerPage));
     setNumOfPages(Math.ceil(baseReviews.length / reviewsPerPage));
-  }
+  };
 
   const handlePageChange = (event, value) => {
     event.preventDefault();
@@ -232,7 +152,7 @@ export default function Reviews() {
     const start = reviewsPerPage * (value - 1);
     const end = start + reviewsPerPage;
     setPagedReviews(reviews.slice(start, end));
-  }
+  };
 
   return (
     <React.Fragment>
@@ -254,99 +174,7 @@ export default function Reviews() {
           </Container>
         </div>
         {/* Filter unit */}
-        <div className={classes.filter}>
-          <DialogTitle id="form-dialog-title">Filter reviews by tags</DialogTitle>
-          <form noValidate autoComplete="off" onSubmit={handleFilter}>
-            <Autocomplete
-              className={classes.degree}
-              id="combo-box-demo"
-              name="major"
-              defaultValue="None"
-              value={major}
-              onChange={(event, newValue) => handleMajorChange(newValue)}
-              options={degrees}
-              getOptionLabel={(option) => option}
-              style={{ width: 300 }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Enter the primary major"
-                  variant="outlined"
-                />
-              )}
-            />
-            <TextField
-              id="secondDegree"
-              name="secondDegree"
-              className={classes.secondDegree}
-              multiline
-              rowsMax={4}
-              value={secondDegree}
-              onChange={handleSecondDegree}
-              disabled={!hasSecondDegree}
-              variant={hasSecondDegree ? "outlined" : "filled"}
-            />
-            <RadioGroup
-             name="typeOfSecondDegree" 
-             valueSelected={typeOfSecondDegree} 
-             onChange={handleHasSecondDegree}
-             >
-              <FormControlLabel
-                value="Double Degree"
-                control={<Radio color="primary" />}
-                label="Double Degree"
-                labelPlacement="end"
-              />
-              <FormControlLabel
-                value="Double Major"
-                control={<Radio color="primary" />}
-                label="Double Major"
-                labelPlacement="end"
-              />
-              <FormControlLabel
-                value="minor"
-                control={<Radio color="primary" />}
-                label="Minor"
-                labelPlacement="end"
-              />
-              <FormControlLabel
-                value=""
-                control={<Radio color="primary" />}
-                label="None"
-                labelPlacement="end"
-              />
-            </RadioGroup>
-            <Autocomplete
-              className={classes.degree}
-              id="combo-box-demo"
-              name="hallRC"
-              value={hallRC}
-              onChange={(event, newValue) => handleHallRCChange(newValue)}
-              options={hallRCs}
-              getOptionLabel={(option) => option}
-              style={{ width: 300 }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Enter any Hall/RCs"
-                />
-              )}
-            />
-            <Button
-              type="submit"
-              variant="contained"
-            >
-              Filter
-            </Button>
-          </form>
-          <Button
-            type="submit"
-            onClick={handleReset}
-            variant="contained"
-          >
-            Reset
-              </Button>
-        </div>
+
         {pagedReviews.length === 0 && (
           <Container Container className={classes.emptyPage} maxWidth="md">
             <Typography variant="h5">No guides are available.</Typography>
@@ -355,6 +183,11 @@ export default function Reviews() {
         )}
         {pagedReviews.length !== 0 && (
           <div>
+            <Filter
+              filterReviews={filterReviews}
+              degrees={degrees}
+              handleReset={handleReset}
+            />
             <Container className={classes.cardGrid} maxWidth="md">
               {/* End hero unit */}
               <Grid container spacing={4}>
@@ -387,14 +220,14 @@ export default function Reviews() {
                             className={classes.icons}
                             component="span"
                           >
-                            {review.upvotes}
+                            {review.upvoted.length}
                           </Typography>
                           <ThumbDownIcon className={classes.icons} />
                           <Typography
                             className={classes.icons}
                             component="span"
                           >
-                            {review.downvotes}
+                            {review.downvoted.length}
                           </Typography>
                         </div>
                       </CardActions>
@@ -404,7 +237,11 @@ export default function Reviews() {
               </Grid>
             </Container>
             <div className={classes.pagination}>
-              <Pagination count={numOfPages} page={currPage} onChange={handlePageChange} />
+              <Pagination
+                count={numOfPages}
+                page={currPage}
+                onChange={handlePageChange}
+              />
             </div>
           </div>
         )}

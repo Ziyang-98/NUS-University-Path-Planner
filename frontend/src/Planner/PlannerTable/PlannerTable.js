@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, withStyles } from "@material-ui/core/styles";
 import Box from "@material-ui/core/Box";
 import Collapse from "@material-ui/core/Collapse";
 import IconButton from "@material-ui/core/IconButton";
@@ -17,13 +17,23 @@ import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
 import DeleteIcon from "@material-ui/icons/Delete";
 import ClearIcon from "@material-ui/icons/Clear";
 
-const useRowStyles = makeStyles({
+const useRowStyles = makeStyles((theme) => ({
   root: {
     "& > *": {
       borderBottom: "unset",
     },
   },
-});
+
+  semCreditNumber: {
+    marginLeft: theme.spacing(1),
+  },
+}));
+
+const TotalCleared = withStyles({
+  root: {
+    fontWeight: "bold",
+  },
+})(Typography);
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -126,16 +136,23 @@ function Row(props) {
                         </TableCell>
                       </TableRow>
                     ))}
+
                     <TableRow>
-                      <TableCell style={{"font-weight": "bold"}}>Total Credits for this semester: </TableCell>
-                      <TableCell/>
-                      <TableCell align="right">
-                        {row.semester1.reduce((total, num) => {
-                          return total + num.moduleCredits
-                        }, 0)
-                        }
+                      <TableCell colSpan={2}>
+                        <TotalCleared variant="subtitle1" component="span">
+                          Total credits for this semester:{" "}
+                        </TotalCleared>
+                        <TotalCleared
+                          className={classes.semCreditNumber}
+                          component="span"
+                        >
+                          {row.semester1.reduce((total, num) => {
+                            return total + num.moduleCredits;
+                          }, 0)}
+                        </TotalCleared>
                       </TableCell>
-                      <TableCell/>
+                      <TableCell align="right" />
+                      <TableCell align="right" />
                     </TableRow>
                   </TableBody>
                 </Table>
@@ -185,15 +202,21 @@ function Row(props) {
                       </TableRow>
                     ))}
                     <TableRow>
-                      <TableCell style={{"font-weight": "bold"}}>Total Credits for this semester: </TableCell>
-                      <TableCell/>
-                      <TableCell align="right">
-                        {row.semester2.reduce((total, num) => {
-                          return total + num.moduleCredits
-                        }, 0)
-                        }
+                      <TableCell colSpan={2}>
+                        <TotalCleared variant="subtitle1" component="span">
+                          Total credits for this semester:{" "}
+                        </TotalCleared>
+                        <TotalCleared
+                          className={classes.semCreditNumber}
+                          component="span"
+                        >
+                          {row.semester2.reduce((total, num) => {
+                            return total + num.moduleCredits;
+                          }, 0)}
+                        </TotalCleared>
                       </TableCell>
-                      <TableCell/>
+                      <TableCell align="right" />
+                      <TableCell align="right" />
                     </TableRow>
                   </TableBody>
                 </Table>
@@ -243,15 +266,21 @@ function Row(props) {
                       </TableRow>
                     ))}
                     <TableRow>
-                      <TableCell style={{"font-weight": "bold"}}>Total Credits for this semester: </TableCell>
-                      <TableCell/>
-                      <TableCell align="right">
-                        {row.specialTerm1.reduce((total, num) => {
-                          return total + num.moduleCredits
-                        }, 0)
-                        }
+                      <TableCell colSpan={2}>
+                        <TotalCleared variant="subtitle1" component="span">
+                          Total credits for this semester:{" "}
+                        </TotalCleared>
+                        <TotalCleared
+                          className={classes.semCreditNumber}
+                          component="span"
+                        >
+                          {row.specialTerm1.reduce((total, num) => {
+                            return total + num.moduleCredits;
+                          }, 0)}
+                        </TotalCleared>
                       </TableCell>
-                      <TableCell/>
+                      <TableCell align="right" />
+                      <TableCell align="right" />
                     </TableRow>
                   </TableBody>
                 </Table>
@@ -301,15 +330,21 @@ function Row(props) {
                       </TableRow>
                     ))}
                     <TableRow>
-                      <TableCell style={{"font-weight": "bold"}}>Total Credits for this semester: </TableCell>
-                      <TableCell/>
-                      <TableCell align="right">
-                        {row.specialTerm2.reduce((total, num) => {
-                          return total + num.moduleCredits
-                        }, 0)
-                        }
+                      <TableCell colSpan={2}>
+                        <TotalCleared variant="subtitle1" component="span">
+                          Total credits for this semester:{" "}
+                        </TotalCleared>
+                        <TotalCleared
+                          className={classes.semCreditNumber}
+                          component="span"
+                        >
+                          {row.specialTerm2.reduce((total, num) => {
+                            return total + num.moduleCredits;
+                          }, 0)}
+                        </TotalCleared>
                       </TableCell>
-                      <TableCell/>
+                      <TableCell align="right" />
+                      <TableCell align="right" />
                     </TableRow>
                   </TableBody>
                 </Table>
@@ -454,12 +489,18 @@ const PlannerTable = ({ moduleList, deleteYear, deleteModule }) => {
             ))}
           </TableBody>
           <TableBody>
-            <TableCell style={{"font-weight": "bold", "font-size": 16}}>
-              Overall MCs obtained: {rows.reduce((total, row) => {
-                return total + row.yearCredits
-              }, 0)
-              }
-            </TableCell>
+            <TableRow>
+              <TableCell />
+              <TableCell style={{ fontWeight: "bold", fontSize: 16 }}>
+                Overall MCs obtained:{" "}
+                {rows.reduce((total, row) => {
+                  return total + row.yearCredits;
+                }, 0)}
+              </TableCell>
+              <TableCell align="right" />
+              <TableCell align="right" />
+              <TableCell align="right" />
+            </TableRow>
           </TableBody>
         </Table>
       </TableContainer>

@@ -242,35 +242,6 @@ Row.propTypes = {
   }).isRequired,
 };
 
-/*
-const sem1 = [
-  createModuleData("CS1101S", "Programming Methodology I", 4),
-  createModuleData("CS2030", "Programming Methodology II", 4),
-];
-
-const sem2 = [
-  createModuleData("CS1101S", "Programming Methodology I", 4),
-  createModuleData("CS2030", "Programming Methodology II", 4),
-];
-
-const st1 = [
-  createModuleData("CS1101S", "Programming Methodology I", 4),
-  createModuleData("CS2030", "Programming Methodology II", 4),
-];
-
-const st2 = [
-  createModuleData("CS1101S", "Programming Methodology I", 4),
-  createModuleData("CS2030", "Programming Methodology II", 4),
-];
-
-const rows = [
-  createAYData("AY19/20", 4, 16, sem1, sem2, [], []),
-  createAYData("AY20/21", 0, 0, [], [], [], []),
-  createAYData("AY21/22", 0, 0, [], [], [], []),
-  createAYData("AY22/23", 0, 0, [], [], [], []),
-];
-*/
-
 function countModuleCredits(sem) {
   var credit = 0;
   for (var i = 0; i < sem.length; i++) {

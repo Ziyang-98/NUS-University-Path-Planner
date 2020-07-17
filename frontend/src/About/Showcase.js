@@ -23,7 +23,7 @@ export default function Showcase() {
   const classes = useStyles();
 
   return (
-    <Container maxWidth="auto" className={classes.container}>
+    <Container className={classes.container}>
       <Box>
         <Typography
           className={classes.text}

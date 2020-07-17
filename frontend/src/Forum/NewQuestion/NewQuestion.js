@@ -3,16 +3,22 @@ import { Redirect, withRouter } from "react-router";
 import auth0Client from "../../Auth";
 import axios from "axios";
 //----------- Handle anonymity -------------//
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
+import Radio from "@material-ui/core/Radio";
+import RadioGroup from "@material-ui/core/RadioGroup";
 import { DialogContentText, FormControlLabel } from "@material-ui/core";
 //---- MUI-----//
 import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core/styles";
-import InputLabel from "@material-ui/core/InputLabel";
 import Button from "@material-ui/core/Button";
 //------ tag style -------//
-import Chip from '@material-ui/core/Chip';
+import Chip from "@material-ui/core/Chip";
+//------ Alerts Dependencies-------//
+import Snackbar from "@material-ui/core/Snackbar";
+import MuiAlert from "@material-ui/lab/Alert";
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -32,6 +38,19 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: theme.spacing(4),
     marginBottom: theme.spacing(2),
   },
+  tag: {
+    margin: theme.spacing(1),
+  },
+  tagForm: {
+    display: "flex",
+    alignItems: "baseline",
+  },
+  button: {
+    margin: theme.spacing(2),
+  },
+  alert: {
+    marginBottom: theme.spacing(2),
+  },
 }));
 
 //---- Changed from class to functional ----//
@@ -48,14 +67,18 @@ function NewQuestion(props) {
   const [tag, setTag] = React.useState("");
   //------- used to redirect  ------//
   const [redirect, setRedirect] = React.useState(false);
+  //------- Alerts --------//
+  const [noTitle, setNoTitle] = React.useState(false);
+  const [noDescription, setNoDescription] = React.useState(false);
+  //const [success, setSuccess] = React.useState(false);
 
   const updateDescription = (value) => {
     setDescription(value);
-  }
+  };
 
   const updateTitle = (value) => {
     setTitle(value);
-  }
+  };
 
   //---- tagging -------- //
   const handleTag = (event) => {
@@ -68,9 +91,9 @@ function NewQuestion(props) {
     if (tag) {
       newTags.push(tag);
     }
-    setTag("")
+    setTag("");
     setTags(newTags);
-  }
+  };
 
   const handleChange = (event) => {
     if (event.target.value === "yes") {
@@ -78,12 +101,42 @@ function NewQuestion(props) {
     } else {
       setHasName(true);
     }
-  }
+  };
+
+  //------- Alert handlers --------//
+  const handleNoTitle = () => {
+    setNoTitle(true);
+  };
+
+  const handleNoDescription = () => {
+    setNoDescription(true);
+  };
+
+  const handleAlertClose = () => {
+    setNoTitle(false);
+    setNoDescription(false);
+  };
+
+  const getDisplayLabel = () => {
+    if (noTitle && noDescription) {
+      return "Please enter a title and a description.";
+    } else if (noTitle) {
+      return "Please enter a title.";
+    } else if (noDescription) {
+      return "Please enter a description.";
+    }
+  };
 
   const submit = async () => {
-    if (title !== "" && description !== "") {
+    if (title === "" && description === "") {
+      handleNoTitle();
+      handleNoDescription();
+    } else if (title === "") {
+      handleNoTitle();
+    } else if (description === "") {
+      handleNoDescription();
+    } else {
       setDisabled(true);
-
       //--- posting to backend ----//
       await axios.post(
         "http://localhost:8081/Forum",
@@ -92,25 +145,32 @@ function NewQuestion(props) {
           description: description,
           hasName: hasName,
           tags: tags,
-          username: localStorage.getItem("username")
+          username: localStorage.getItem("username"),
         },
         {
           headers: { Authorization: `Bearer ${auth0Client.getIdToken()}` },
         }
       );
+      // console.log({
+      //   title: title,
+      //   description: description,
+      //   hasName: hasName,
+      //   tags: tags,
+      //   username: localStorage.getItem("username"),
+      // });
       setRedirect(true);
     }
-  }
+  };
 
   const deleteTag = (tagId) => {
     let newTags = [...tags];
     newTags.splice(tagId, 1);
-    setTags(newTags)
-      // .then(window.location.reload(false))
-  }
+    setTags(newTags);
+    // .then(window.location.reload(false))
+  };
 
   if (redirect) {
-    return <Redirect to="/Forum" />
+    return <Redirect to="/Forum" />;
   } else {
     return (
       <div className="container">
@@ -145,28 +205,37 @@ function NewQuestion(props) {
                 </div>
                 <div>
                   <div>
-                    {tags.map((tag, index) => <Chip size="small" label={tag} onDelete={() => deleteTag(index)} />)}
+                    {tags.map((tag, index) => (
+                      <Chip
+                        key={tag}
+                        className={classes.tag}
+                        size="small"
+                        label={tag}
+                        onDelete={() => deleteTag(index)}
+                      />
+                    ))}
                   </div>
-                  < form noValidate autoComplete="off" onSubmit={handleClick} >
-                    <InputLabel htmlFor="filter">Add tag here...</InputLabel>
+                  <form
+                    className={classes.tagForm}
+                    noValidate
+                    autoComplete="off"
+                    onSubmit={handleClick}
+                  >
+                    {/* <InputLabel htmlFor="filter">Add tag here...</InputLabel> */}
                     <TextField
                       className={classes.filter}
                       id="filter"
                       name="filter"
+                      label="Add tag here"
                       multiline
                       rowsMax={4}
                       value={tag}
                       onChange={handleTag}
                       variant="outlined"
                       style={{ width: 300 }}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Enter any Hall/RCs"
-                        />
-                      )}
                     />
                     <Button
+                      className={classes.button}
                       type="submit"
                       variant="contained"
                     >
@@ -180,7 +249,7 @@ function NewQuestion(props) {
                 <form className="form-group" noValidate autoComplete="off">
                   <RadioGroup
                     name="hasName"
-                    valueSelected={hasName}
+                    valueselected={hasName.toString()}
                     onChange={handleChange}
                     defaultValue="no"
                   >
@@ -211,6 +280,20 @@ function NewQuestion(props) {
             </div>
           </div>
         </div>
+        {/*----Alerts----*/}
+        <Snackbar
+          open={noTitle || noDescription}
+          autoHideDuration={3000}
+          onClose={handleAlertClose}
+        >
+          <Alert
+            className={classes.alert}
+            onClose={handleAlertClose}
+            severity="error"
+          >
+            {getDisplayLabel()}
+          </Alert>
+        </Snackbar>
       </div>
     );
   }

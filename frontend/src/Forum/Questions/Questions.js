@@ -1,87 +1,51 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import Chip from '@material-ui/core/Chip';
+import Chip from "@material-ui/core/Chip";
 //--- styles -----//
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import ThumbDownIcon from "@material-ui/icons/ThumbDown";
-//----- MUI stuff -----//
-import TextField from "@material-ui/core/TextField";
-import Button from "@material-ui/core/Button";
-import InputLabel from "@material-ui/core/InputLabel";
+
 //------ Pagination ------//
 import Pagination from "@material-ui/lab/Pagination";
+
+import FilterSection from "./FilterSection";
 
 const useStyles = makeStyles((theme) => ({
   icon: {
     marginRight: theme.spacing(2),
   },
-  heroContent: {
-    backgroundColor: theme.palette.background.paper,
-    padding: theme.spacing(14, 0, 8),
+  reviews: {
+    fontWeight: 500,
   },
-  showcaseContent: {
-    color: "#3f51b5",
-    fontWeight: 400,
+  votes: {
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1),
   },
-
-  emptyPage: {
-    paddingTop: theme.spacing(8),
-    paddingBottom: theme.spacing(8),
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
+  tag: {
+    margin: 2,
+    backgroundColor: "#e8eaf6",
   },
-
-  heroButtons: {
-    marginTop: theme.spacing(4),
+  tagholder: {
+    marginBottom: theme.spacing(2),
   },
-  cardGrid: {
-    paddingTop: theme.spacing(8),
-    paddingBottom: theme.spacing(8),
-  },
-  card: {
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
-  },
-  cardMedia: {
-    paddingTop: "56.25%", // 16:9
-  },
-  cardContent: {
-    flexGrow: 1,
-  },
-  cardActions: {
-    display: "flex",
-    alignItems: "baseline",
+  icons: {
+    marginRight: theme.spacing(1),
   },
   pagination: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+    paddingTop: theme.spacing(2),
     marginBottom: theme.spacing(6),
-  },
-  filter: {
-    paddingTop: theme.spacing(8),
-    paddingBottom: theme.spacing(8),
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  reviews: {
-    fontWeight: 500,
-  },
-  votes: {
-    marginLeft: theme.spacing(2),
-  },
-  icons: {
-    marginLeft: theme.spacing(1),
   },
 }));
 
-export default function Questions({ username }) {
+export default function Questions() {
+  const username = localStorage.getItem("username");
+
   //------ styles ---------//
   const classes = useStyles();
   //----- used when component first mounts -----//
@@ -100,20 +64,7 @@ export default function Questions({ username }) {
   //Change this to change how many reviews displayed per page
   const questionsPerPage = 3;
 
-  const hallRCs = [
-    "Eusoff Hall",
-    "Kent Ridge Hall",
-    "King Edward VII Hall",
-    "Raffles Hall",
-    "Sheares Hall",
-    "Temasek Hall",
-    "PGP House",
-    "Ridge View Residential College (RVRC)",
-    "College of Alice and Peter Tan (CAPT)",
-    "Residential College 4 (RC4)",
-    "Tembusu College",
-    "University Scholars Programme (USP)"
-  ];
+  //----- Alerts --------//
 
   const fn = () => {
     async function fetchData() {
@@ -130,8 +81,8 @@ export default function Questions({ username }) {
           //preventing division by 0
           denom1 = denom1 === 0 ? 1 : denom1;
           denom2 = denom2 === 0 ? 1 : denom2;
-          return (r2.upvotes / denom2) - (r1.upvotes / denom1);
-        })
+          return r2.upvotes / denom2 - r1.upvotes / denom1;
+        });
         setBaseQuestions(result);
         setQuestions(result);
         setNumOfPages(Math.ceil(result.length / questionsPerPage));
@@ -140,7 +91,7 @@ export default function Questions({ username }) {
       }
     }
     fetchData();
-  }
+  };
 
   useEffect(fn, []);
 
@@ -149,7 +100,6 @@ export default function Questions({ username }) {
   };
 
   const filterQuestions = (tagsToFilter) => {
-    console.log(tagsToFilter)
     // this piece of code is temporary
     //change to a popup warning for empty filter input
     if (tagsToFilter.length === 0) {
@@ -168,27 +118,27 @@ export default function Questions({ username }) {
           filteredQuestions.push(qn);
         }
         return qn.tags.includes(tag);
-      })
+      });
     }
     setQuestions(filteredQuestions);
     setNumOfPages(Math.ceil(filteredQuestions.length / questionsPerPage));
     setPagedQuestions(filteredQuestions.slice(0, questionsPerPage));
-  }
+  };
 
   const handleFilter = (event) => {
     event.preventDefault();
     filterQuestions(tags);
-  }
+  };
 
   const handleClick = (event) => {
     event.preventDefault();
     const newTags = [...tags];
-    if (tag) {
+    if (tag && !tags.includes(tag)) {
       newTags.push(tag);
+      setTag("");
+      setTags(newTags);
     }
-    setTag("")
-    setTags(newTags);
-  }
+  };
 
   const handlePageChange = (event, value) => {
     event.preventDefault();
@@ -196,7 +146,7 @@ export default function Questions({ username }) {
     const start = questionsPerPage * (value - 1);
     const end = start + questionsPerPage;
     setPagedQuestions(questions.slice(start, end));
-  }
+  };
 
   //----- filters to display questions made by user ------//
   const handleAuthor = (event) => {
@@ -207,7 +157,7 @@ export default function Questions({ username }) {
     setQuestions(filteredQuestions);
     setNumOfPages(Math.ceil(filteredQuestions.length / questionsPerPage));
     setPagedQuestions(filteredQuestions.slice(0, questionsPerPage));
-  }
+  };
 
   //------- refreshes the site ---------//
   const handleRefresh = (event) => {
@@ -215,125 +165,32 @@ export default function Questions({ username }) {
     setQuestions(filteredQuestions);
     setNumOfPages(Math.ceil(filteredQuestions.length / questionsPerPage));
     setPagedQuestions(filteredQuestions.slice(0, questionsPerPage));
-  }
+    setCurrPage(1);
+  };
+
+  const handleDelete = (tagToDelete) => {
+    let clonedTags = [...tags];
+    console.log(clonedTags);
+    clonedTags = clonedTags.filter((tag) => tag !== tagToDelete);
+    console.log(clonedTags);
+    setTags(clonedTags);
+  };
 
   return (
-    <div className="container" >
+    <div className="container">
       {/* Filter component added */}
-      {tags}
-      < form noValidate autoComplete="off" onSubmit={handleClick} >
-        <InputLabel htmlFor="filter">Add tag here...</InputLabel>
-        <TextField
-          className={classes.filter}
-          id="filter"
-          name="filter"
-          multiline
-          rowsMax={4}
-          value={tag}
-          onChange={handleTag}
-          variant="outlined"
-          style={{ width: 300 }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Enter any Hall/RCs"
-            />
-          )}
-        />
-        <Button
-          type="submit"
-          variant="contained"
-        >
-          Add
-          </Button>
-        {/* <Autocomplete
-          className={classes.degree}
-          id="combo-box-demo"
-          name="major"
-          defaultValue="None"
-          value={major}
-          onChange={(event, newValue) => handleMajorChange(newValue)}
-          options={degrees}
-          getOptionLabel={(option) => option}
-          style={{ width: 300 }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Enter the primary major"
-              variant="outlined"
-            />
-          )}
-        /> */}
-        {/* <RadioGroup
-          name="typeOfSecondDegree"
-          valueSelected={typeOfSecondDegree}
-          onChange={handleHasSecondDegree}
-        >
-          <FormControlLabel
-            value="Double Degree"
-            control={<Radio color="primary" />}
-            label="Double Degree"
-            labelPlacement="end"
-          />
-          <FormControlLabel
-            value="Double Major"
-            control={<Radio color="primary" />}
-            label="Double Major"
-            labelPlacement="end"
-          />
-          <FormControlLabel
-            value="minor"
-            control={<Radio color="primary" />}
-            label="Minor"
-            labelPlacement="end"
-          />
-          <FormControlLabel
-            value=""
-            control={<Radio color="primary" />}
-            label="None"
-            labelPlacement="end"
-          />
-        </RadioGroup>
-        <Autocomplete
-          className={classes.degree}
-          id="combo-box-demo"
-          name="hallRC"
-          value={hallRC}
-          onChange={(event, newValue) => handleHallRCChange(newValue)}
-          options={hallRCs}
-          getOptionLabel={(option) => option}
-          style={{ width: 300 }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Enter any Hall/RCs"
-            />
-          )}
-        /> */}
-      </form>
-      <Button
-        type="submit"
-        variant="contained"
-        onClick={handleFilter}
-      >
-        Filter
-      </Button>
-      <Button
-        type="submit"
-        variant="contained"
-        onClick={handleAuthor}
-      >
-        View your own questions
-      </Button>
-      <Button
-        type="submit"
-        variant="contained"
-        onClick={handleRefresh}
-      >
-        Refresh
-      </Button>
+      <FilterSection
+        tag={tag}
+        tags={tags}
+        handleTag={handleTag}
+        handleClick={handleClick}
+        handleFilter={handleFilter}
+        handleAuthor={handleAuthor}
+        handleRefresh={handleRefresh}
+        handleDelete={handleDelete}
+      />
       {/* Filter component end */}
-      < div className="row" >
+      <div className="row">
         <Link to={{ pathname: "/new-question", state: { degrees: degrees } }}>
           <div className="card text-white bg-secondary mb-3">
             <div className="card-header">Need help? Ask here!</div>
@@ -344,55 +201,51 @@ export default function Questions({ username }) {
           </div>
         </Link>
         {pagedQuestions === null && <p>Loading questions...</p>}
-        {
-          pagedQuestions &&
+        {pagedQuestions &&
           pagedQuestions.map((question) => (
             <div key={question.id} className="col-sm-12 col-md-4 col-lg-3">
               <Link to={`/question/${question.id}`}>
                 <div className="card text-white bg-success mb-3">
                   <div className="card-header">
                     Answers: {question.answers.length} <br />
-                      Upvotes: {question.upvotes} <br />
-                      Downvotes: {question.downvotes}
+                    <div className={classes.votes}>
+                      <ThumbUpIcon className={classes.icons} />
+                      <Typography className={classes.icons} component="span">
+                        {question.upvoted.length}
+                      </Typography>
+                      <ThumbDownIcon className={classes.icons} />
+                      <Typography className={classes.icons} component="span">
+                        {question.downvoted.length}
+                      </Typography>
+                    </div>
                   </div>
                   <div className="card-body">
                     <h4 className="card-title">{question.title}</h4>
                     <p className="card-text">{question.description}</p>
-                    <div className="card text-white bg-secondary mb-3">
-                      {question.tags.map((tag) => <Chip size="small" label={tag} />)}
+                    <div className={classes.tagholder}>
+                      {question.tags.map((tag) => (
+                        <Chip
+                          className={classes.tag}
+                          size="small"
+                          label={tag}
+                          key={tag}
+                        />
+                      ))}
                     </div>
                     <p className="card-text">Posted by {question.name}</p>
-                  </div>
-                  <div className={classes.votes}>
-                    <ThumbUpIcon className={classes.icons} />
-                    <Typography
-                      className={classes.icons}
-                      component="span"
-                    >
-                      {question.upvotes}
-                    </Typography>
-                    <ThumbDownIcon className={classes.icons} />
-                    <Typography
-                      className={classes.icons}
-                      component="span"
-                    >
-                      {question.downvotes}
-                    </Typography>
                   </div>
                 </div>
               </Link>
             </div>
-          ))
-        }
-        <div className={classes.pagination}>
-          <Pagination
-            count={numOfPages}
-            page={currPage}
-            onChange={handlePageChange}
-          />
-        </div>
-      </div >
-    </div >
+          ))}
+      </div>
+      <div className={classes.pagination}>
+        <Pagination
+          count={numOfPages}
+          page={currPage}
+          onChange={handlePageChange}
+        />
+      </div>
+    </div>
   );
-
 }

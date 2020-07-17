@@ -59,58 +59,65 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function RatingBar({
-  noOfUpvotes,
-  noOfDownvotes,
   upvote,
   downvote,
   upvotedNames,
   downvotedNames,
+  name,
 }) {
-  // const value =
-  //   upvotedNames.length === 0 && downvotedNames.length === 0
-  //     ? 0
-  //     : (upvotedNames.length / (upvotedNames.length + downvotedNames.length)) *
-  //       5;
-  const upvotes = noOfUpvotes;
-  const downvotes = noOfDownvotes;
   const classes = useStyles();
+  const username = localStorage.getItem("username");
   const [upvoted, setUpvote] = React.useState(false);
   const [downvoted, setDownvote] = React.useState(false);
+  //console.log(upvotedNames);
 
   useEffect(() => {
-    if (auth0Client.isAuthenticated()) {
-      if (upvotedNames.includes(auth0Client.getProfile().name)) {
-        setUpvote(true);
-      }
+    // if (auth0Client.isAuthenticated()) {
+    if (upvotedNames.includes(username)) {
+      setUpvote(true);
     }
-  }, [upvotedNames]);
+    if (downvotedNames.includes(username)) {
+      setDownvote(true);
+    }
+    //}
+  }, [name]);
 
-  useEffect(() => {
-    if (auth0Client.isAuthenticated()) {
-      if (downvotedNames.includes(auth0Client.getProfile().name)) {
-        setDownvote(true);
-      }
-    }
-  }, [downvotedNames]);
+  // useEffect(() => {
+  //   //if (auth0Client.isAuthenticated()) {
+  //   if (downvotedNames.includes(username)) {
+  //     setDownvote(true);
+  //   }
+  //   // }
+  // }, [downvotedNames]);
 
   const handleUpvote = () => {
-    if (!upvoted) {
-      setUpvote(true);
-      setDownvote(false);
+    if (auth0Client.isAuthenticated()) {
+      upvote(auth0Client.getProfile().name);
+
+      if (!upvoted) {
+        setUpvote(true);
+        setDownvote(false);
+      } else {
+        setUpvote(false);
+      }
     } else {
-      setUpvote(false);
+      auth0Client.signIn();
     }
-    upvote(auth0Client.getProfile().name);
   };
 
   const handleDownvote = () => {
-    if (!downvoted) {
-      setDownvote(true);
-      setUpvote(false);
+    if (auth0Client.isAuthenticated()) {
+      downvote(auth0Client.getProfile().name);
+
+      if (!downvoted) {
+        setDownvote(true);
+        setUpvote(false);
+      } else {
+        setDownvote(false);
+      }
     } else {
-      setDownvote(false);
+      auth0Client.signIn();
     }
-    downvote(auth0Client.getProfile().name);
   };
 
   return (
@@ -120,35 +127,47 @@ export default function RatingBar({
       </div>
 
       <div className={classes.value}>
-        <Typography component="span">{upvotes}</Typography>
+        <Typography component="span">{upvotedNames.length}</Typography>
       </div>
       <div className={classes.thumbsdown}>
         <ThumbDownIcon />
       </div>
 
       <div className={classes.value}>
-        <Typography component="span">{downvotes}</Typography>
+        <Typography component="span">{downvotedNames.length}</Typography>
       </div>
 
       <div className={classes.upvote}>
-        <Button
-          variant="contained"
-          //className={upvote ? classes.votedColour : classes.voteColour}
-          className={upvoted ? classes.votedButton : classes.upvoteButton}
-          onClick={handleUpvote}
-        >
-          <span>
-            <ThumbUpIcon
-              size="small"
-              className={upvoted ? classes.votedIcon : classes.voteIcon}
-            />
-          </span>
-          <span>
-            <Typography className={upvoted ? classes.voted : classes.vote}>
-              {upvoted ? "Upvoted" : "Vote"}
-            </Typography>
-          </span>
-        </Button>
+        {upvoted && (
+          <Button
+            variant="contained"
+            //className={upvote ? classes.votedColour : classes.voteColour}
+            className={classes.votedButton}
+            onClick={handleUpvote}
+          >
+            <span>
+              <ThumbUpIcon size="small" className={classes.votedIcon} />
+            </span>
+            <span>
+              <Typography className={classes.voted}>{"Upvoted"}</Typography>
+            </span>
+          </Button>
+        )}
+        {!upvoted && (
+          <Button
+            variant="contained"
+            //className={upvote ? classes.votedColour : classes.voteColour}
+            className={classes.upvoteButton}
+            onClick={handleUpvote}
+          >
+            <span>
+              <ThumbUpIcon size="small" className={classes.voteIcon} />
+            </span>
+            <span>
+              <Typography className={classes.vote}>{"Vote"}</Typography>
+            </span>
+          </Button>
+        )}
       </div>
       <div className={classes.downvote}>
         <Button

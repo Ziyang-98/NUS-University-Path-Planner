@@ -5,10 +5,11 @@ import auth0Client from "./Auth";
 class Callback extends Component {
   async componentDidMount() {
     await auth0Client.handleAuthentication();
-    this.props.history.replace("/");
+    this.props.history.push("/");
   }
 
   render() {
+    console.log(this.props.history.location.state);
     return <p>Loading profile...</p>;
   }
 }

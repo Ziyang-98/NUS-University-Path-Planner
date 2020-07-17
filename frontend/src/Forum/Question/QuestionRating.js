@@ -8,7 +8,7 @@ import Button from "@material-ui/core/Button";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    marginTop: theme.spacing(6),
+    marginTop: theme.spacing(4),
     display: "flex",
     alignItems: "center",
   },
@@ -58,8 +58,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function RatingBar({
-  noOfUpvotes,
-  noOfDownvotes,
+  // noOfUpvotes,
+  // noOfDownvotes,
   upvote,
   downvote,
   upvotedNames,
@@ -70,12 +70,14 @@ export default function RatingBar({
   //     ? 0
   //     : (upvotedNames.length / (upvotedNames.length + downvotedNames.length)) *
   //       5;
-  const upvotes = noOfUpvotes;
-  const downvotes = noOfDownvotes;
+  // const upvotes = noOfUpvotes;
+  // const downvotes = noOfDownvotes;
   const classes = useStyles();
   const username = localStorage.getItem("username");
   const [upvoted, setUpvote] = React.useState(upvotedNames.includes(username));
-  const [downvoted, setDownvote] = React.useState(downvotedNames.includes(username));
+  const [downvoted, setDownvote] = React.useState(
+    downvotedNames.includes(username)
+  );
 
   //Do not remove the comments in the useEffects(), they prevent a certain warning.
   useEffect(() => {
@@ -83,35 +85,35 @@ export default function RatingBar({
       setUpvote(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [upvotedNames]);
+  }, []);
 
   useEffect(() => {
-
     if (downvotedNames.includes(username)) {
       setDownvote(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [downvotedNames]);
+  }, []);
 
   const handleUpvote = () => {
+    upvote(username);
+
     if (!upvoted) {
-      console.log("upvoting")
       setUpvote(true);
       setDownvote(false);
     } else {
       setUpvote(false);
     }
-    upvote(username);
   };
 
   const handleDownvote = () => {
+    downvote(username);
+
     if (!downvoted) {
       setDownvote(true);
       setUpvote(false);
     } else {
       setDownvote(false);
     }
-    downvote(username);
   };
 
   return (
@@ -121,14 +123,14 @@ export default function RatingBar({
       </div>
 
       <div className={classes.value}>
-        <Typography component="span">{upvotes}</Typography>
+        <Typography component="span">{upvotedNames.length}</Typography>
       </div>
       <div className={classes.thumbsdown}>
         <ThumbDownIcon />
       </div>
 
       <div className={classes.value}>
-        <Typography component="span">{downvotes}</Typography>
+        <Typography component="span">{downvotedNames.length}</Typography>
       </div>
 
       <div className={classes.upvote}>

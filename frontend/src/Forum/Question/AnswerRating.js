@@ -1,24 +1,25 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import ThumbDownIcon from "@material-ui/icons/ThumbDown";
-import Button from "@material-ui/core/Button";
 import auth0Client from "../../Auth";
+import IconButton from "@material-ui/core/IconButton";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    marginTop: theme.spacing(6),
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
     display: "flex",
     alignItems: "center",
+    marginRight: theme.spacing(2),
   },
   thumbsup: {
     float: "left",
   },
   value: {
     float: "left",
-    marginLeft: theme.spacing(1),
+    // marginLeft: theme.spacing(1),
   },
 
   thumbsdown: {
@@ -59,8 +60,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function RatingBar({
-  noOfUpvotes,
-  noOfDownvotes,
+  // noOfUpvotes,
+  // noOfDownvotes,
   upvote,
   downvote,
   upvotedNames,
@@ -72,68 +73,105 @@ export default function RatingBar({
   //     ? 0
   //     : (upvotedNames.length / (upvotedNames.length + downvotedNames.length)) *
   //       5;
-  const upvotes = noOfUpvotes;
-  const downvotes = noOfDownvotes;
+  // const upvotes = noOfUpvotes;
+  // const downvotes = noOfDownvotes;
   const classes = useStyles();
   const username = localStorage.getItem("username");
   const [upvoted, setUpvote] = React.useState(upvotedNames.includes(username));
-  const [downvoted, setDownvote] = React.useState(downvotedNames.includes(username));
+  const [downvoted, setDownvote] = React.useState(
+    downvotedNames.includes(username)
+  );
 
-  useEffect(() => {
-    if (auth0Client.isAuthenticated()) {
-      if (upvotedNames.includes(auth0Client.getProfile().name)) {
-        setUpvote(true);
-      }
-    }
-  }, [upvotedNames]);
+  // useEffect(() => {
+  //   if (auth0Client.isAuthenticated()) {
+  //     if (upvotedNames.includes(auth0Client.getProfile().name)) {
+  //       setUpvote(true);
+  //     }
+  //   }
+  // }, []);
 
-  useEffect(() => {
-    if (auth0Client.isAuthenticated()) {
-      if (downvotedNames.includes(auth0Client.getProfile().name)) {
-        setDownvote(true);
-      }
-    }
-  }, [downvotedNames]);
+  // useEffect(() => {
+  //   if (auth0Client.isAuthenticated()) {
+  //     if (downvotedNames.includes(auth0Client.getProfile().name)) {
+  //       setDownvote(true);
+  //     }
+  //   }
+  // }, []);
 
   const handleUpvote = () => {
+    upvote(auth0Client.getProfile().name, answerId);
+
     if (!upvoted) {
-      console.log("upvoting")
       setUpvote(true);
       setDownvote(false);
     } else {
       setUpvote(false);
     }
-    upvote(auth0Client.getProfile().name, answerId);
   };
 
   const handleDownvote = () => {
+    downvote(auth0Client.getProfile().name, answerId);
+
     if (!downvoted) {
       setDownvote(true);
       setUpvote(false);
     } else {
       setDownvote(false);
     }
-    downvote(auth0Client.getProfile().name, answerId);
   };
 
   return (
-    <Container width="auto" className={classes.root}>
+    <div width="auto" className={classes.root}>
       <div className={classes.thumbsup}>
-        <ThumbUpIcon />
+        {!upvoted && (
+          <IconButton
+            aria-label="upvote"
+            color="default"
+            onClick={handleUpvote}
+          >
+            <ThumbUpIcon />
+          </IconButton>
+        )}
+        {upvoted && (
+          <IconButton
+            aria-label="upvote"
+            color="primary"
+            onClick={handleUpvote}
+          >
+            <ThumbUpIcon />
+          </IconButton>
+        )}
       </div>
 
       <div className={classes.value}>
-        <Typography component="span">{upvotes}</Typography>
+        <Typography component="span">{upvotedNames.length}</Typography>
       </div>
       <div className={classes.thumbsdown}>
-        <ThumbDownIcon />
+        {!downvoted && (
+          <IconButton
+            aria-label="downvote"
+            color="default"
+            onClick={handleDownvote}
+          >
+            <ThumbDownIcon />
+          </IconButton>
+        )}
+        {downvoted && (
+          <IconButton
+            aria-label="downvote"
+            color="primary"
+            onClick={handleDownvote}
+          >
+            <ThumbDownIcon />
+          </IconButton>
+        )}
       </div>
 
       <div className={classes.value}>
-        <Typography component="span">{downvotes}</Typography>
+        <Typography component="span">{downvotedNames.length}</Typography>
       </div>
 
-      <div className={classes.upvote}>
+      {/* <div className={classes.upvote}>
         <Button
           variant="contained"
           //className={upvote ? classes.votedColour : classes.voteColour}
@@ -174,7 +212,7 @@ export default function RatingBar({
             </Typography>
           </span>
         </Button>
-      </div>
-    </Container>
+      </div> */}
+    </div>
   );
 }
