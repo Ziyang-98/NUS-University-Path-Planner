@@ -70,7 +70,7 @@ class Question extends Component {
 
   async componentDidMount() {
     //Change this to change how many reviews displayed per page
-    const answersPerPage = 3;
+    const answersPerPage = 6;
 
     const {
       match: { params },
@@ -121,10 +121,21 @@ class Question extends Component {
     const {
       match: { params },
     } = this.props;
-    const question = (
-      await axios.get(`http://localhost:8081/Forum/${params.questionId}`)
-    ).data;
-    const answers = question.answers;
+    const question = await axios.get(
+      `http://localhost:8081/Forum/${params.questionId}`
+    );
+
+    const answers = question.data.answers;
+    const currPage =
+      Math.ceil(answers.length / this.state.answersPerPage) >=
+      this.state.currPage
+        ? this.state.currPage
+        : this.state.currPage === 1
+        ? 1
+        : this.state.currPage - 1;
+    const start = (currPage - 1) * this.state.answersPerPage;
+    const end = start + this.state.answersPerPage;
+
     // answers.sort((r1, r2) => {
     //   let denom1 = r1.upvotes + r1.downvotes;
     //   let denom2 = r2.upvotes + r2.downvotes;
@@ -138,7 +149,8 @@ class Question extends Component {
       answers,
       baseAnswers: answers,
       numOfPages: Math.ceil(answers.length / this.state.answersPerPage),
-      pagedAnswers: answers.slice(0, this.state.answersPerPage),
+      pagedAnswers: answers.slice(start, end),
+      currPage,
     });
   }
 

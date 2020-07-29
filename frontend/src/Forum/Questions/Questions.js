@@ -62,7 +62,7 @@ export default function Questions() {
   const [currPage, setCurrPage] = useState(1);
   const [pagedQuestions, setPagedQuestions] = useState([]);
   //Change this to change how many reviews displayed per page
-  const questionsPerPage = 3;
+  const questionsPerPage = 6;
 
   //----- Alerts --------//
 

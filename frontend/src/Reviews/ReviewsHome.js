@@ -174,7 +174,11 @@ export default function Reviews() {
           </Container>
         </div>
         {/* Filter unit */}
-
+        <Filter
+          filterReviews={filterReviews}
+          degrees={degrees}
+          handleReset={handleReset}
+        />
         {pagedReviews.length === 0 && (
           <Container Container className={classes.emptyPage} maxWidth="md">
             <Typography variant="h5">No guides are available.</Typography>
@@ -183,11 +187,6 @@ export default function Reviews() {
         )}
         {pagedReviews.length !== 0 && (
           <div>
-            <Filter
-              filterReviews={filterReviews}
-              degrees={degrees}
-              handleReset={handleReset}
-            />
             <Container className={classes.cardGrid} maxWidth="md">
               {/* End hero unit */}
               <Grid container spacing={4}>

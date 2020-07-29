@@ -14,12 +14,19 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(2),
   },
   imageContent: {
-    padding: theme.spacing(25, 0, 5),
+    //padding: theme.spacing(25, 0, 5),
   },
   heroContent: {
-    backgroundColor: theme.palette.background.paper,
-    padding: theme.spacing(4, 0, 30),
+    // backgroundColor: theme.palette.background.paper,
+    // padding: theme.spacing(4, 0, 30),
+    marginTop: "18%",
   },
+  imageHolder: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
   heroButtons: {
     marginTop: theme.spacing(4),
   },
@@ -36,7 +43,7 @@ export default function Homw() {
 
         <div className={classes.heroContent}>
           <div className={classes.imageContent}>
-            <Box display="flex" alignItems="center" justifyContent="center">
+            <Box className={classes.imageHolder}>
               <img src={Logo} alt="app logo" />
             </Box>
           </div>

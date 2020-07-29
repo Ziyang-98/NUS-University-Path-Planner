@@ -120,7 +120,7 @@ export default function ExportDialog({
     setSecondDegree("");
     setTypeOfSecondDegree("");
     setHasHallRC(false);
-    setHallRC("");
+    setHallRC(null);
   };
 
   const handleTitleChange = (event) => {
@@ -178,7 +178,7 @@ export default function ExportDialog({
         }
         tags.push(secondDegree);
       }
-      if (hallRC !== "") {
+      if (hallRC !== null) {
         tags.push(hallRC);
       }
       tags.push(major);

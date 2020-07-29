@@ -44,12 +44,14 @@ class Planner extends Component {
         name: username,
       });
 
-      let data = await axios.get(
+      const degreesData = await axios.get(`http://localhost:8081/degrees`);
+      const degrees = degreesData.data.degrees;
+
+      const data = await axios.get(
         `http://localhost:8081/Planner/users/${username}`
       );
       const userData = data.data;
-      data = await axios.get(`http://localhost:8081/degrees`);
-      const degrees = data.data.degrees;
+
       //this.setState({ userData, degrees });
 
       let reviewData = await axios.get(
